@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/logo-horizontal.png" alt="DeliView" width="420"></p>
+<p align="center"><img src="assets/logo-completo.png" alt="DeliView" width="260"></p>
 
 # DeliView
 
@@ -211,7 +211,7 @@ flowchart LR
 ├── README.md                  este arquivo
 ├── assets/
 │   ├── logo.png               ícone do DeliView (menu e favicon)
-│   ├── logo-horizontal.png    logo com fundo transparente (README)
+│   ├── logo-completo.png      logo com o nome (README)
 │   ├── fontes/                Bricolage Grotesque (licença OFL) da apresentação
 │   └── telas/                 prints com os dados fictícios usados na apresentação
 ├── css/
