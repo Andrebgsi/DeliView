@@ -1,0 +1,2433 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DeliView — Integração de dados</title>
+    <style>
+      :root {
+        --floresta: #0f3d2e;
+        --folha: #2f7d4f;
+        --menta: #e4f0e8;
+        --fundo: #f5f9f6;
+        --milho: #f2b544;
+        --tinta: #16241d;
+        --suave: #5b6b62;
+        --linha: #cfdcd3;
+        --alerta: #b5382e;
+        --branco: #ffffff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--fundo);
+        color: var(--tinta);
+        font:
+          16px/1.5 "Segoe UI Variable",
+          "Segoe UI",
+          system-ui,
+          -apple-system,
+          sans-serif;
+      }
+      header.topo {
+        background: var(--floresta);
+        color: #fff;
+      }
+      header.topo .in {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      header.topo svg {
+        width: 34px;
+        height: 34px;
+        flex: none;
+      }
+      header.topo b {
+        font-size: 18px;
+        letter-spacing: 0.2px;
+      }
+      header.topo span {
+        color: #b9d4c4;
+        font-size: 14px;
+        margin-left: auto;
+      }
+      main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 32px 20px 64px;
+      }
+      h1 {
+        font-size: clamp(26px, 4vw, 36px);
+        line-height: 1.15;
+        margin: 0 0 10px;
+        font-weight: 750;
+      }
+      h2 {
+        font-size: 21px;
+        margin: 40px 0 12px;
+        font-weight: 700;
+      }
+      p.lead {
+        max-width: 62ch;
+        color: var(--suave);
+        margin: 0 0 24px;
+        font-size: 17px;
+      }
+      .drop {
+        border: 2px dashed var(--folha);
+        background: var(--menta);
+        border-radius: 14px;
+        padding: 34px 22px;
+        text-align: left;
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+      }
+      .drop:hover,
+      .drop.over {
+        background: #d5e9dc;
+        border-color: var(--floresta);
+      }
+      .drop:focus-visible,
+      button:focus-visible,
+      select:focus-visible {
+        outline: 3px solid var(--milho);
+        outline-offset: 2px;
+      }
+      .drop svg {
+        width: 52px;
+        height: 52px;
+        flex: none;
+      }
+      .drop strong {
+        display: block;
+        font-size: 19px;
+      }
+      .drop small {
+        color: var(--suave);
+        font-size: 15px;
+      }
+      .lista {
+        list-style: none;
+        margin: 18px 0 0;
+        padding: 0;
+        border: 1px solid var(--linha);
+        border-radius: 12px;
+        background: var(--branco);
+      }
+      .lista li {
+        display: grid;
+        grid-template-columns: 28px 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 13px 16px;
+        border-top: 1px solid var(--linha);
+      }
+      .lista li:first-child {
+        border-top: 0;
+      }
+      .lista .marca {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid var(--linha);
+        display: grid;
+        place-items: center;
+      }
+      .lista li.ok .marca {
+        background: var(--folha);
+        border-color: var(--folha);
+      }
+      .lista li.ok .marca::after {
+        content: "";
+        width: 6px;
+        height: 11px;
+        border: solid #fff;
+        border-width: 0 2.5px 2.5px 0;
+        transform: rotate(45deg) translate(-1px, -1px);
+      }
+      .lista .nome {
+        font-weight: 600;
+      }
+      .lista .det {
+        color: var(--suave);
+        font-size: 14px;
+        word-break: break-word;
+      }
+      .lista li.ok .det {
+        color: var(--folha);
+        font-weight: 600;
+      }
+      .lista button.x {
+        background: none;
+        border: 0;
+        color: var(--suave);
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 4px 6px;
+      }
+      .aviso {
+        margin-top: 14px;
+        padding: 12px 16px;
+        border-left: 4px solid var(--milho);
+        background: #fff7e3;
+        border-radius: 6px;
+        font-size: 15px;
+      }
+      .aviso.erro {
+        border-color: var(--alerta);
+        background: #fdeceb;
+      }
+      button.principal {
+        margin-top: 18px;
+        background: var(--floresta);
+        color: #fff;
+        border: 0;
+        border-radius: 10px;
+        padding: 15px 26px;
+        font: inherit;
+        font-weight: 700;
+        font-size: 17px;
+        cursor: pointer;
+      }
+      button.principal:hover:not(:disabled) {
+        background: #0b2f23;
+      }
+      button.principal:disabled {
+        background: #a9b9af;
+        cursor: not-allowed;
+      }
+      button.sec {
+        background: #fff;
+        color: var(--floresta);
+        border: 2px solid var(--floresta);
+        border-radius: 10px;
+        padding: 11px 18px;
+        font: inherit;
+        font-weight: 650;
+        cursor: pointer;
+      }
+      button.sec:hover {
+        background: var(--menta);
+      }
+      .tabela {
+        overflow-x: auto;
+        border: 1px solid var(--linha);
+        border-radius: 12px;
+        background: var(--branco);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 15px;
+      }
+      th,
+      td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--linha);
+        white-space: nowrap;
+      }
+      th {
+        background: var(--menta);
+        font-weight: 650;
+      }
+      td.n,
+      th.n {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      .selo {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 99px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .selo.ok {
+        background: #d7ecdd;
+        color: #14502f;
+      }
+      .selo.falha {
+        background: #f8d7d3;
+        color: #7e211a;
+      }
+      .resumo-val {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+      .resumo-val b {
+        font-size: 30px;
+        font-weight: 750;
+      }
+      .baixar {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .previa-barra {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+      select {
+        font: inherit;
+        padding: 9px 12px;
+        border: 1.5px solid var(--linha);
+        border-radius: 8px;
+        background: #fff;
+      }
+      details {
+        margin-top: 18px;
+      }
+      summary {
+        cursor: pointer;
+        font-weight: 650;
+      }
+      pre {
+        background: var(--floresta);
+        color: #d9eadf;
+        padding: 16px;
+        border-radius: 10px;
+        overflow: auto;
+        max-height: 340px;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      footer {
+        max-width: 980px;
+        margin: 40px auto 0;
+        padding: 24px 20px 48px;
+        color: var(--suave);
+        font-size: 14px;
+        border-top: 1px solid var(--linha);
+        line-height: 1.6;
+      }
+      footer p {
+        margin: 0;
+      }
+      footer .sub {
+        font-size: 13px;
+        color: var(--suave);
+        margin-top: 6px;
+      }
+      .oculto {
+        display: none !important;
+      }
+
+      /* ====================================================================
+         ESTILOS DO POPUP / MODAL DE ORIENTAÇÃO E DOCUMENTAÇÃO
+         ==================================================================== */
+      .btn-doc-topo {
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        color: #fff;
+        padding: 7px 14px;
+        border-radius: 8px;
+        font: inherit;
+        font-size: 13.5px;
+        font-weight: 650;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.15s, border-color 0.15s, transform 0.1s;
+        margin-left: 10px;
+        flex-shrink: 0;
+      }
+      .btn-doc-topo:hover {
+        background: rgba(255, 255, 255, 0.28);
+        border-color: #fff;
+      }
+      .btn-doc-topo:active {
+        transform: scale(0.97);
+      }
+      .btn-doc-inline {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--menta);
+        color: var(--floresta);
+        border: 1.5px solid var(--folha);
+        padding: 6px 14px;
+        border-radius: 99px;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s, transform 0.1s;
+      }
+      .btn-doc-inline:hover {
+        background: #d4ebd9;
+      }
+      .btn-doc-inline:active {
+        transform: scale(0.97);
+      }
+      /* Fundo escurecido e translúcido (Backdrop com blur) */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 61, 46, 0.68);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+      .modal-backdrop.aberto {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      /* Cartão da Janela Modal */
+      .modal-card {
+        background: var(--branco);
+        color: var(--tinta);
+        width: 100%;
+        max-width: 820px;
+        max-height: 90vh;
+        border-radius: 16px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--linha);
+        transform: translateY(20px) scale(0.96);
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
+      }
+      .modal-backdrop.aberto .modal-card {
+        transform: translateY(0) scale(1);
+      }
+      /* Cabeçalho do Modal */
+      .modal-header {
+        padding: 18px 24px;
+        background: var(--floresta);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .modal-header h2 {
+        font-size: 19px;
+        margin: 0;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 750;
+      }
+      .modal-badge {
+        font-size: 11px;
+        background: rgba(255, 255, 255, 0.18);
+        color: #e4f0e8;
+        padding: 3px 8px;
+        border-radius: 99px;
+        font-weight: 600;
+        margin-left: auto;
+      }
+      .modal-fechar {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 26px;
+        line-height: 1;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 6px;
+        transition: background 0.15s, opacity 0.15s;
+        opacity: 0.85;
+      }
+      .modal-fechar:hover {
+        background: rgba(255, 255, 255, 0.2);
+        opacity: 1;
+      }
+      /* Corpo do Modal com rolagem */
+      .modal-body {
+        padding: 24px 28px;
+        overflow-y: auto;
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--tinta);
+      }
+      .modal-body h3 {
+        font-size: 17px;
+        font-weight: 750;
+        color: var(--floresta);
+        margin: 22px 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .modal-body h3:first-child {
+        margin-top: 0;
+      }
+      .modal-destaque {
+        background: var(--menta);
+        border-left: 4px solid var(--folha);
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+        font-size: 14.5px;
+      }
+      .modal-destaque strong {
+        color: var(--floresta);
+      }
+      .modal-grid-meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .modal-meta-box {
+        background: #fbfdfc;
+        border: 1px solid var(--linha);
+        border-radius: 8px;
+        padding: 10px 14px;
+      }
+      .modal-meta-box small {
+        color: var(--suave);
+        display: block;
+        font-size: 11.5px;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+      .modal-meta-box b {
+        color: var(--floresta);
+        font-size: 13.5px;
+      }
+      .modal-passos {
+        list-style: none;
+        counter-reset: p-counter;
+        padding: 0;
+        margin: 12px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .modal-passos li {
+        position: relative;
+        padding-left: 42px;
+      }
+      .modal-passos li::before {
+        content: counter(p-counter);
+        counter-increment: p-counter;
+        position: absolute;
+        left: 0;
+        top: 2px;
+        width: 28px;
+        height: 28px;
+        background: var(--floresta);
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 750;
+        font-size: 13px;
+      }
+      .modal-passos strong {
+        display: block;
+        color: var(--tinta);
+        margin-bottom: 2px;
+      }
+      .modal-passos small {
+        color: var(--suave);
+        font-size: 13.5px;
+      }
+      .modal-lista-fontes {
+        background: #fbfdfc;
+        border: 1px solid var(--linha);
+        border-radius: 8px;
+        padding: 10px 16px;
+        margin: 8px 0 12px;
+        font-size: 13.5px;
+      }
+      .modal-lista-fontes li {
+        padding: 4px 0;
+        position: static;
+      }
+      .modal-lista-fontes li::before {
+        display: none;
+      }
+      .modal-tab {
+        width: 100%;
+        table-layout: auto;
+        display: table;
+        border-collapse: collapse;
+        font-size: 12.5px;
+        margin: 6px 0 14px;
+      }
+      .modal-tab th,
+      .modal-tab td {
+        border: 1px solid var(--linha);
+        padding: 6px 8px;
+        text-align: left;
+        vertical-align: top;
+        white-space: normal;
+        overflow-wrap: break-word;
+      }
+      .modal-tab th:first-child {
+        min-width: 48px;
+      }
+      .modal-tab th {
+        background: #eef5f0;
+      }
+      .modal-nota {
+        color: var(--suave);
+        font-size: 13.5px;
+        margin: 6px 0 10px;
+      }
+      .modal-decisoes {
+        padding-left: 20px;
+        color: var(--suave);
+        font-size: 13.5px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      /* Rodapé do Modal */
+      .modal-footer {
+        padding: 14px 24px;
+        background: #fbfdfc;
+        border-top: 1px solid var(--linha);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .modal-link-doc {
+        font-size: 13.5px;
+        color: var(--folha);
+        font-weight: 650;
+        text-decoration: underline;
+      }
+      .modal-link-doc:hover {
+        color: var(--floresta);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ====================================================================
+         CABEÇALHO DA APLICAÇÃO
+         ==================================================================== -->
+    <header class="topo">
+      <div class="in">
+        <img
+          src="../assets/logo.png"
+          alt="Logotipo DeliView"
+          width="34"
+          height="34"
+        />
+        <b>DeliView</b>
+        <span>Integração de dados de vendas</span>
+        <!-- Botão para abrir o Popup de Documentação & Como Usar -->
+        <button class="btn-doc-topo" id="btn-doc" type="button" aria-haspopup="dialog" aria-controls="modal-doc">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+          </svg>
+          Orientações
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <h1>Monte a base de dados do DeliView</h1>
+      <p class="lead">
+        Solte os 2 relatórios "Dados do pedido" exportados do iFood e do 99Food.
+        O motor ETL (Kimball) padroniza descontos, taxas e valores e monta as
+        tabelas do modelo dimensional da Etapa 5.
+      </p>
+
+      <div style="margin: -12px 0 22px;">
+        <button class="btn-doc-inline" id="btn-doc-lead" type="button">
+          📖 Ver Orientações: Visão Geral e Como Usar
+        </button>
+      </div>
+
+      <!-- ====================================================================
+           POPUP / MODAL: DOCUMENTAÇÃO TÉCNICA, VISÃO GERAL & COMO USAR
+           ==================================================================== -->
+      <div
+        class="modal-backdrop"
+        id="modal-doc"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-titulo"
+        aria-hidden="true"
+      >
+        <div class="modal-card">
+          <div class="modal-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22" aria-hidden="true">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <h2 id="modal-titulo">Documentação Técnica — Motor ETL DeliView</h2>
+            <span class="modal-badge">PUC Minas • 2026/02</span>
+            <button class="modal-fechar" id="btn-fechar-doc" type="button" aria-label="Fechar janela de documentação">&times;</button>
+          </div>
+
+          <div class="modal-body">
+            <!-- 1. Cabeçalho e Metadados -->
+            <div class="modal-grid-meta">
+              <div class="modal-meta-box">
+                <small>Ambiente de Execução</small>
+                <b>Navegador (100% Client-side)</b>
+              </div>
+              <div class="modal-meta-box">
+                <small>Padrão Arquitetural</small>
+                <b>Modelagem Kimball (Star Schema)</b>
+              </div>
+              <div class="modal-meta-box">
+                <small>Dependências Externas</small>
+                <b>Zero (APIs Web Nativas)</b>
+              </div>
+            </div>
+
+            <!-- 2. Visão Geral -->
+            <h3>2. Visão Geral</h3>
+            <div class="modal-destaque">
+              <strong>Em uma frase:</strong> O sistema é um pipeline de ETL client-side em JavaScript puro que descompacta, valida, padroniza e consolida relatórios de pedidos heterogêneos do iFood e do 99Food em um Data Mart dimensional relacional (modelo da Etapa 5, v2), exportando-o em Excel (.xlsx) e CSV sem nenhum servidor.
+            </div>
+            <p style="margin-bottom: 12px; color: var(--suave); font-size: 14.5px;">
+              O <strong>DeliView</strong> atende restaurantes que operam simultaneamente nos canais <strong>iFood</strong> e <strong>99Food</strong>. Cada plataforma emite extratos com formatos, nomenclaturas e critérios contábeis discrepantes (taxas, comissões e descontos concedidos pela loja ou subsidiados pela plataforma).
+            </p>
+            <p style="margin-bottom: 8px; color: var(--suave); font-size: 14.5px;">
+              O motor resolve 3 desafios fundamentais:
+            </p>
+            <ul style="padding-left: 20px; color: var(--suave); font-size: 14px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 6px;">
+              <li><strong>Padronização de Medidas:</strong> Equaliza, nos dois canais, o valor bruto, os descontos, a taxa de motoboy, as taxas e comissões, o total pago e o líquido nas colunas da FATO_PEDIDO.</li>
+              <li><strong>Regra ZERA FATOS (Data Quality):</strong> Em pedidos cancelados, o valor bruto é mantido para acompanhamento de demanda perdida, enquanto taxas, fretes e repasses líquidos são zerados, evitando distorções em somatórios de faturamento.</li>
+              <li><strong>Independência Tecnológica:</strong> Executa parsers binários de ZIP/Deflate e geradores OpenXML do zero usando <code>DecompressionStream</code> e <code>DOMParser</code>, sem necessidade de SheetJS ou servidor Node.js.</li>
+            </ul>
+
+            <!-- 3. Como Usar / Como Executar -->
+            <h3>3. Como Usar / Como Executar</h3>
+            <ol class="modal-passos">
+              <li>
+                <strong>1. Carregue os 2 relatórios de pedidos</strong>
+                <small>Arraste para a caixa pontilhada (ou clique nela) os arquivos <code>.xlsx</code>:</small>
+                <ul class="modal-lista-fontes">
+                  <li><strong>iFood (Pedidos):</strong> relatório "Dados do pedido" exportado do Portal do Parceiro.</li>
+                  <li><strong>99Food (Pedidos):</strong> relatório "Dados do pedido" da 99Food.</li>
+                </ul>
+                <small>Se for solto outro relatório conhecido (conciliação do iFood, dados da loja do 99Food ou planilha de custos), ele é reconhecido, mas ignorado com um aviso: essas fontes não alimentam o modelo v2.</small>
+              </li>
+              <li>
+                <strong>2. Acompanhe a identificação automática</strong>
+                <small>O sistema inspeciona os cabeçalhos de cada arquivo sem enviar nada para a internet. Cada arquivo reconhecido ganha uma marca de verificação verde (<span class="selo ok" style="padding: 1px 6px; font-size: 11px;">OK</span>) na lista.</small>
+              </li>
+              <li>
+                <strong>3. Clique em "Montar base de dados dimensional"</strong>
+                <small>Com os 2 relatórios carregados, o botão é habilitado. Ele roda os 8 jobs (0 a 7) descritos na seção 4.</small>
+              </li>
+              <li>
+                <strong>4. Audite os resultados na tela</strong>
+                <small>Confira os KPIs por plataforma, as 6 conferências automáticas e a prévia de qualquer uma das 9 tabelas geradas no seletor.</small>
+              </li>
+              <li>
+                <strong>5. Baixe o Data Mart nos formatos desejados</strong>
+                <small>Excel (<strong>.xlsx</strong>) com uma aba por tabela, pacote de <strong>CSVs (.zip)</strong> com acentos compatíveis com o Excel, ou o <strong>log (.txt)</strong> da execução.</small>
+              </li>
+            </ol>
+
+            <!-- 4. Jobs -->
+            <h3>4. Os jobs, um a um</h3>
+            <p class="modal-nota">O pipeline é fiel ao diagrama <code>ModelagemDimensional_Etapa05_v2.drawio</code>: toda tabela e toda coluna de saída existe no diagrama, com o mesmo nome.</p>
+            <table class="modal-tab">
+              <thead><tr><th>Job</th><th>O que faz</th><th>Lê</th><th>Gera</th></tr></thead>
+              <tbody>
+                <tr><td>0</td><td>Extração e deduplicação: mantém a 1ª ocorrência de cada ID de pedido e registra alerta se houver repetidos.</td><td>iFood: ID COMPLETO DO PEDIDO · 99Food: ID do pedido</td><td>Listas de pedidos sem repetição</td></tr>
+                <tr><td>1</td><td>Calendário diário contínuo, de 01/01 do menor ano a 31/12 do maior ano dos pedidos.</td><td>iFood: DATA E HORA DO PEDIDO · 99Food: Data</td><td>DIM_TEMPO</td></tr>
+                <tr><td>2</td><td>Cria as dimensões de negócio. Padroniza a forma de pagamento numa categoria comum (Pix, Crédito, Débito, Carteira Digital, App do Banco, Dinheiro, Online sem detalhe, Outros).</td><td>FORMA DE PAGAMENTO / Forma de pagamento</td><td>DIM_CANAL, DIM_STATUS, DIM_PAGAMENTO, DIM_TIPO_ENTREGA</td></tr>
+                <tr><td>3</td><td>Converte cada pedido do iFood nas medidas do modelo e aplica a regra ZERA FATOS.</td><td>Colunas do relatório do iFood (seção 5)</td><td>Pedidos iFood padronizados</td></tr>
+                <tr><td>4</td><td>Idem para o 99Food. O status vem de "Horário do cancelamento" (preenchido = CANCELADO).</td><td>Colunas do relatório do 99Food (seção 5)</td><td>Pedidos 99Food padronizados</td></tr>
+                <tr><td>5</td><td>Junta os dois canais e troca cada texto pela chave substituta da dimensão (FK).</td><td>Saídas dos jobs 2, 3 e 4</td><td>FATO_PEDIDO</td></tr>
+                <tr><td>6</td><td>Cria a FATO_META com a estrutura do modelo. As plataformas não exportam metas, então ela fica vazia até o parceiro informá-las.</td><td>(sem fonte)</td><td>FATO_META (vazia)</td></tr>
+                <tr><td>7</td><td>Validação da carga: 3 conferências contábeis (iFood x2, 99Food) e 3 de integridade (PK única, FKs existentes, cancelados zerados).</td><td>FATO_PEDIDO e dimensões</td><td>VALIDACAO_DA_CARGA, PROBLEMAS_E_TRATAMENTOS</td></tr>
+              </tbody>
+            </table>
+
+            <!-- 5. Dicionário FATO_PEDIDO -->
+            <h3>5. FATO_PEDIDO: de onde vem cada coluna</h3>
+            <table class="modal-tab">
+              <thead><tr><th>Coluna (diagrama)</th><th>iFood</th><th>99Food</th></tr></thead>
+              <tbody>
+                <tr><td>ID_PEDIDO (PK, dim. degenerada)</td><td>ID COMPLETO DO PEDIDO</td><td>ID do pedido</td></tr>
+                <tr><td>ID_CANAL (FK)</td><td>1 = iFood</td><td>2 = 99Food</td></tr>
+                <tr><td>ID_TEMPO (FK)</td><td>DATA E HORA DO PEDIDO (dia)</td><td>Data</td></tr>
+                <tr><td>ID_STATUS (FK)</td><td>STATUS FINAL DO PEDIDO</td><td>CANCELADO se "Horário do cancelamento" estiver preenchido; senão CONCLUIDO</td></tr>
+                <tr><td>ID_PAGAMENTO (FK)</td><td>FORMA DE PAGAMENTO, padronizada</td><td>Forma de pagamento, padronizada</td></tr>
+                <tr><td>ID_TIPO_ENTREGA (FK)</td><td>Entrega parceira iFood</td><td>Entrega da plataforma (99Food)</td></tr>
+                <tr><td>VALOR_BRUTO_PEDIDO</td><td>VALOR DOS ITENS (R$)</td><td>Preço original do item</td></tr>
+                <tr><td>VALOR_DESCONTOS</td><td>Incentivo promocional da loja + da rede + do iFood</td><td>Despesas de marketing (= Preço original − Receita de vendas)</td></tr>
+                <tr><td>TAXA_MOTOBOY</td><td>0 (a taxa de entrega é paga pelo cliente e repassada à logística)</td><td>Custos logísticos</td></tr>
+                <tr><td>VALOR_TAXAS</td><td>|TAXAS E COMISSOES (R$)|</td><td>Despesas de comissão + Taxas de processamento de pagamento</td></tr>
+                <tr><td>VALOR_TOTAL_PAGO</td><td>TOTAL PAGO PELO CLIENTE (R$)</td><td>Receita de vendas</td></tr>
+                <tr><td>VALOR_LIQUIDO</td><td>VALOR LIQUIDO (R$)</td><td>Receita real da loja</td></tr>
+              </tbody>
+            </table>
+            <p class="modal-nota"><strong>Regra ZERA FATOS:</strong> em pedido CANCELADO só o VALOR_BRUTO_PEDIDO é mantido (demanda perdida); descontos, motoboy, taxas, total pago e líquido ficam em 0, para não distorcer somas de faturamento.</p>
+            <p class="modal-nota"><strong>Fechamento das contas (concluídos):</strong> iFood: líquido = bruto − desconto da loja − taxas. 99Food: líquido = total pago − taxas − motoboy. Essas contas são conferidas no job 7.</p>
+
+            <!-- 6. Decisões -->
+            <h3>6. Decisões de modelagem e pontos a validar com o parceiro</h3>
+            <ul class="modal-decisoes">
+              <li><strong>Taxa de serviço do iFood</strong> e <strong>taxa de entrega paga pelo cliente</strong> não são colunas do modelo. Elas já estão dentro de VALOR_TOTAL_PAGO e só são usadas na conferência 2 do job 7. [A VALIDAR] se devem virar medidas.</li>
+              <li><strong>Recompensas da plataforma (99Food)</strong> não entram em VALOR_DESCONTOS: são bônus pago à loja, não desconto ao cliente, e não participam do fechamento do líquido.</li>
+              <li><strong>Forma de pagamento "Online (sem detalhe)":</strong> o 99Food só informa "Pagamento online" ou "em dinheiro"; não dá para separar Pix de cartão nesse canal.</li>
+              <li><strong>Momento do pagamento</strong> (pelo app x na entrega) e <strong>hora/turno</strong> do pedido não existem no diagrama v2 e, por isso, não são carregados.</li>
+              <li><strong>FATO_META</strong> sai vazia: nenhuma plataforma exporta metas. Liga-se às vendas pela DIM_TEMPO.</li>
+              <li><strong>Base pequena:</strong> os dados de agosto/2026 têm 19 pedidos no iFood e 67 no 99Food; os percentuais são indicativos.</li>
+            </ul>
+
+            <!-- 7. Histórico -->
+            <h3>7. O que mudou em relação à versão anterior</h3>
+            <table class="modal-tab">
+              <thead><tr><th>Item</th><th>Antes</th><th>Agora (v2)</th></tr></thead>
+              <tbody>
+                <tr><td>Arquivos exigidos</td><td>5 (pedidos x2, conciliação, loja, custos)</td><td>2 (pedidos iFood e 99Food)</td></tr>
+                <tr><td>Jobs</td><td>0 a 7 e 9 (sem 8)</td><td>0 a 7, em sequência</td></tr>
+                <tr><td>DIM_PRODUTO</td><td>Carregada do cardápio</td><td>Retirada (decisão da professora: não será implementada)</td></tr>
+                <tr><td>FATO_LANCAMENTO</td><td>Carregada da conciliação do iFood</td><td>Retirada: não está no diagrama</td></tr>
+                <tr><td>DIM_PAGAMENTO</td><td>METODO_PAGAMENTO + MOMENTO_PAGAMENTO</td><td>FORMA_PAGAMENTO (como no diagrama)</td></tr>
+                <tr><td>FATO_PEDIDO</td><td>17 colunas (inclui HORA, TURNO, DESCONTO_LOJA, DESCONTO_PLATAFORMA, TAXA_ENTREGA_CLIENTE, CUSTO_LOGISTICO, TAXA_SERVICO)</td><td>12 colunas, as do diagrama</td></tr>
+                <tr><td>FATO_META</td><td>Inexistente</td><td>Criada vazia</td></tr>
+                <tr><td>DIM_TEMPO</td><td>Coluna NOME_DIA_SEMNA (erro de grafia)</td><td>NOME_DIA_SEMANA (corrigido também no diagrama)</td></tr>
+                <tr><td>Conferências</td><td>3</td><td>6</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="modal-footer">
+            <button class="principal" id="btn-fechar-doc-rodape" type="button" style="margin-top: 0; padding: 10px 20px; font-size: 14.5px;">
+              Entendi, fechar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           ZONA DE DROP (ARRASTAR E SOLTAR OU CLIQUE PARA SELEÇÃO)
+           ==================================================================== -->
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Zona de seleção de arquivos Excel">
+        <svg viewBox="0 0 52 52" aria-hidden="true">
+          <rect
+            x="9"
+            y="4"
+            width="30"
+            height="40"
+            rx="4"
+            fill="#fff"
+            stroke="#2f7d4f"
+            stroke-width="2.5"
+          />
+          <path
+            d="M16 17h16M16 24h16M16 31h10"
+            stroke="#2f7d4f"
+            stroke-width="2.5"
+            stroke-linecap="round"
+          />
+          <circle cx="38" cy="38" r="11" fill="#f2b544" />
+          <path
+            d="M38 44V32m-5 5 5-5 5 5"
+            stroke="#16241d"
+            stroke-width="3"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <div>
+          <strong
+            >Arraste os arquivos .xlsx para cá ou clique para escolher</strong
+          >
+          <small>O processamento ocorre localmente neste computador.</small>
+        </div>
+        <!-- Input de arquivo nativo invisível acionado programaticamente -->
+        <input type="file" id="arq" accept=".xlsx" multiple class="oculto" />
+      </div>
+
+      <!-- Lista interativa com os 2 slots de arquivos obrigatórios -->
+      <ul class="lista" id="lista"></ul>
+
+      <!-- Painel para mensagens de erro e avisos de arquivos -->
+      <div id="avisos"></div>
+
+      <!-- Botão principal de disparo do motor de transformação (habilita quando os 2 relatórios estiverem presentes) -->
+      <button class="principal" id="rodar" disabled>
+        Montar base de dados dimensional
+      </button>
+
+      <!-- ====================================================================
+           PAINEL DE RESULTADOS (EXIBIDO APÓS O PROCESSAMENTO DO ETL)
+           ==================================================================== -->
+      <section id="resultado" class="oculto" aria-live="polite">
+        <h2>Resultado</h2>
+        <div class="resumo-val">
+          <b id="vtotal"></b><span id="vtexto"></span>
+        </div>
+
+        <h2 style="margin-top: 28px">Vendas por plataforma</h2>
+        <div class="tabela"><table id="tresumo"></table></div>
+        <p style="color: var(--suave); font-size: 14px">
+          Considera apenas pedidos concluídos. Cancelamentos são mantidos na
+          fato apenas com valor bruto para controle.
+        </p>
+
+        <h2>Conferências automáticas</h2>
+        <div class="tabela"><table id="tval"></table></div>
+
+        <h2>Baixar Data Mart</h2>
+        <div class="baixar">
+          <button class="principal" id="bxlsx">Base de dados (Excel)</button>
+          <button class="sec" id="bcsv">Tabelas em CSV (.zip)</button>
+          <button class="sec" id="blog">Registro da execução (.txt)</button>
+        </div>
+
+        <h2>Conferir as tabelas</h2>
+        <div class="previa-barra">
+          <label for="selt">Tabela</label
+          ><select id="selt"></select>
+        </div>
+        <div class="tabela"><table id="tprevia"></table></div>
+
+        <details>
+          <summary>
+            Problemas encontrados e padronizações efetuadas (Data Quality)
+          </summary>
+          <div class="tabela" style="margin-top: 10px">
+            <table id="tprob"></table>
+          </div>
+        </details>
+
+        <details>
+          <summary>Registro do Log (Passo a Passo)</summary>
+          <pre id="log"></pre>
+        </details>
+      </section>
+      
+    </main>
+
+    <!-- ====================================================================
+         RODAPÉ DA APLICAÇÃO
+         ==================================================================== -->
+    <footer>
+      <p>Os dados não saem deste computador. Os arquivos gerados seguem o modelo dimensional do projeto (Etapa 5, v2): duas estrelas, pedidos e metas.</p><br/>
+      <p class="sub">André Bacelar · PUC Minas 2026/02</p>
+    </footer>
+
+    <script>
+      "use strict";
+
+      /**
+       * ==============================================================================
+       * PROJETO ETL - DELIVIEW (INTEGRAÇÃO DE DADOS & MODELAGEM DIMENSIONAL)
+       * ==============================================================================
+       * 
+       * Este script implementa um pipeline completo de Extração, Transformação e Carga
+       * (ETL) no padrão Dimensional de Ralph Kimball, executado 100% no navegador (Client-side),
+       * sem necessidade de servidores back-end, bancos de dados externos ou bibliotecas de terceiros.
+       * 
+       * ARQUITETURA DO MOTOR:
+       * ------------------------------------------------------------------------------
+       * 1. CAMADA BINÁRIA E I/O (Sem dependências externas):
+       *    - Leitor PKZIP e descompressor Deflate nativo usando a Web Streams API (DecompressionStream).
+       *    - Parser de planilhas OpenXML (.xlsx), lendo arquivos workbook.xml, sharedStrings e sheets.
+       *    - Gerador binário PKZIP v2.0 com cálculo de CRC32 em tabela pré-calculada.
+       *    - Serializador OpenXML SpreadsheetML para exportação direta em formato .xlsx nativo.
+       * 
+       * 2. MOTOR ETL (KIMBALL) - fiel ao diagrama ModelagemDimensional_Etapa05_v2.drawio:
+       *    - Job 0 (Extração & Deduplicação): unicidade por ID de pedido (iFood e 99Food).
+       *    - Job 1 (DIM_TEMPO): calendário diário contínuo.
+       *    - Job 2 (Dimensões): DIM_CANAL, DIM_STATUS, DIM_PAGAMENTO, DIM_TIPO_ENTREGA.
+       *    - Job 3 (Transformação iFood): medidas padronizadas + regra ZERA FATOS.
+       *    - Job 4 (Transformação 99Food): medidas padronizadas + regra ZERA FATOS.
+       *    - Job 5 (FATO_PEDIDO): substituição por chaves substitutas/estrangeiras (FKs).
+       *    - Job 6 (FATO_META): estrutura do modelo, sem carga (plataformas não exportam metas).
+       *    - Job 7 (Validação): 3 conferências contábeis + 3 de integridade do modelo.
+       *    Fora do modelo v2 (retirados): FATO_ITEM_PEDIDO, DIM_PRODUTO, FATO_LANCAMENTO,
+       *    HORA/TURNO e a planilha de custos. Veja o histórico de alterações no popup "Orientações".
+       * 
+       * 3. CAMADA DE INTERFACE E EXPORTAÇÃO:
+       *    - Drag & drop de arquivos com classificação automática baseada no cabeçalho.
+       *    - Dashboard interativo com KPIs, relatórios de auditoria e prévia dinâmica das tabelas.
+       *    - Download em Excel (.xlsx), CSVs individuais em .zip e registro de log em .txt.
+       * ==============================================================================
+       */
+
+      /* ============================================================================
+       * 1. CAMADA DE BAIXO NÍVEL: DECOMPRESSÃO E PARSER OPENXML / ZIP
+       * ============================================================================ */
+
+      /** Encoders nativos para conversão de texto UTF-8 em buffers de bytes e vice-versa */
+      const enc = new TextEncoder(),
+        dec = new TextDecoder("utf-8");
+
+      /**
+       * Descompacta um fluxo de bytes comprimido com o algoritmo DEFLATE (RFC 1951).
+       * Utiliza a API nativa do navegador DecompressionStream, dispensando bibliotecas como pako ou zlib.
+       *
+       * @async
+       * @param {Uint8Array} bytes - Array de bytes comprimidos brutos extraídos do arquivo ZIP.
+       * @returns {Promise<Uint8Array>} Promessa com os bytes descompactados em memória.
+       * @example
+       * const xmlBytes = await inflar(bytesComprimidos);
+       */
+      async function inflar(bytes) {
+        const s = new Blob([bytes])
+          .stream()
+          .pipeThrough(new DecompressionStream("deflate-raw"));
+        return new Uint8Array(await new Response(s).arrayBuffer());
+      }
+
+      /**
+       * Lê e decodifica a estrutura binária de um arquivo no formato PKZIP (.xlsx).
+       * Varre o arquivo para localizar o registro de fim do diretório central (End of Central Directory),
+       * mapeando os arquivos internos para permitir leitura assíncrona sob demanda com descompressão.
+       *
+       * @async
+       * @param {ArrayBuffer} buf - Conteúdo binário bruto do arquivo compactado.
+       * @returns {Promise<Object>} Dicionário onde cada chave é o nome do arquivo interno e possui o método `_ler(nome)`.
+       * @throws {Error} Lança erro caso a assinatura do cabeçalho PKZIP (0x06054b50) não seja encontrada.
+       */
+      async function lerZip(buf) {
+        const u = new Uint8Array(buf),
+          dv = new DataView(buf);
+
+        // Varre de trás para frente procurando a assinatura do registro 'End of Central Directory' (0x06054b50)
+        let e = u.length - 22;
+        while (e >= 0 && dv.getUint32(e, true) !== 0x06054b50) e--;
+        if (e < 0) throw new Error("não é um arquivo .xlsx válido");
+
+        // Extrai a contagem de entradas e o ponteiro para o início do Diretório Central
+        const n = dv.getUint16(e + 10, true);
+        let p = dv.getUint32(e + 16, true);
+        const out = {};
+
+        // Itera sobre cada cabeçalho de arquivo no Diretório Central
+        for (let i = 0; i < n; i++) {
+          const met = dv.getUint16(p + 10, true), // Método de compressão (0 = armazenado, 8 = deflate)
+            cs = dv.getUint32(p + 20, true),      // Tamanho comprimido (Compressed Size)
+            nl = dv.getUint16(p + 28, true),      // Comprimento do nome do arquivo
+            el = dv.getUint16(p + 30, true),      // Comprimento do campo extra
+            cl = dv.getUint16(p + 32, true),      // Comprimento do comentário
+            lo = dv.getUint32(p + 42, true);      // Offset do cabeçalho local do arquivo
+
+          // Decodifica o caminho interno do arquivo (ex.: "xl/workbook.xml")
+          const nome = dec.decode(u.subarray(p + 46, p + 46 + nl));
+
+          // Calcula onde os dados reais do arquivo começam, pulando o cabeçalho local (30 bytes + nomes/extras)
+          const ini =
+            lo + 30 + dv.getUint16(lo + 26, true) + dv.getUint16(lo + 28, true);
+
+          out[nome] = { met, dados: u.subarray(ini, ini + cs) };
+
+          // Salta para o próximo cabeçalho no diretório central
+          p += 46 + nl + el + cl;
+        }
+
+        /**
+         * Método utilitário para ler e descompactar sob demanda um arquivo interno do ZIP como string UTF-8.
+         * @param {string} nome - Caminho interno do arquivo (ex.: "xl/sharedStrings.xml").
+         * @returns {Promise<string|null>} Conteúdo decodificado ou null se o arquivo não existir.
+         */
+        out._ler = async (nome) => {
+          const f = out[nome];
+          if (!f) return null;
+          return dec.decode(f.met === 0 ? f.dados : await inflar(f.dados));
+        };
+        return out;
+      }
+
+      /**
+       * Utilitário para realizar o parse de uma string XML em uma árvore DOM navegável.
+       * @param {string} t - Texto XML a ser interpretado.
+       * @returns {Document} Documento XML manipulável com querySelector / getElementsByTagName.
+       */
+      const xml = (t) => new DOMParser().parseFromString(t, "application/xml");
+
+      /**
+       * Converte referências de coordenadas de colunas alfabéticas do Excel em índices numéricos de base zero.
+       * Exemplo: "A1" -> 0, "B5" -> 1, "Z3" -> 25, "AA1" -> 26.
+       *
+       * @param {string} ref - Referência alfanumérica da célula no Excel (ex.: "C12").
+       * @returns {number} Índice numérico da coluna (0-based).
+       */
+      function colIdx(ref) {
+        let n = 0;
+        // Remove a parte numérica (número da linha), mantendo apenas as letras da coluna
+        for (const ch of ref.replace(/[0-9]/g, ""))
+          n = n * 26 + ch.charCodeAt(0) - 64; // Cálculo posicional em base 26
+        return n - 1;
+      }
+
+      /**
+       * Interpreta um arquivo Excel (.xlsx) OpenXML binário e extrai todas as suas abas e linhas de dados.
+       * Lê a estrutura interna de pastas do Excel, processa as strings compartilhadas (Shared Strings Table)
+       * e alinha as células nas colunas corretas de acordo com a notação A1, B1, C1.
+       *
+       * @async
+       * @param {ArrayBuffer} buf - Buffer de memória contendo os bytes do arquivo .xlsx.
+       * @returns {Promise<{abas: Object<string, Array<Array<string>>>, ordem: string[]}>}
+       * Objeto contendo o mapa de abas (matrizes de strings) e a ordem original das abas.
+       */
+      async function lerXlsx(buf) {
+        const z = await lerZip(buf),
+          wb = xml(await z._ler("xl/workbook.xml")),
+          rels = xml(await z._ler("xl/_rels/workbook.xml.rels"));
+
+        // Mapeia relacionamentos rId -> caminho do arquivo da aba (ex.: rId1 -> worksheets/sheet1.xml)
+        const alvo = {};
+        for (const r of rels.getElementsByTagName("Relationship"))
+          alvo[r.getAttribute("Id")] = r.getAttribute("Target");
+
+        // Carrega a Shared Strings Table (tabela onde o Excel guarda strings para não repetir textos)
+        let sst = [];
+        const sstTxt = await z._ler("xl/sharedStrings.xml");
+        if (sstTxt)
+          for (const si of xml(sstTxt).getElementsByTagName("si"))
+            sst.push(
+              [...si.getElementsByTagName("t")]
+                .map((t) => t.textContent)
+                .join(""),
+            );
+
+        const abas = {},
+          ordem = [];
+
+        // Itera sobre as abas declaradas no workbook
+        for (const s of wb.getElementsByTagName("sheet")) {
+          const nome = s.getAttribute("name"),
+            rid =
+              s.getAttribute("r:id") ||
+              s.getAttributeNS(
+                "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
+                "id",
+              );
+          let t = alvo[rid];
+          t = t.startsWith("/") ? t.slice(1) : "xl/" + t;
+          const doc = xml(await z._ler(t)),
+            linhas = [];
+
+          // Percorre as linhas (<row>) e células (<c>) da planilha
+          for (const row of doc.getElementsByTagName("row")) {
+            const r = [];
+            for (const c of row.getElementsByTagName("c")) {
+              const i = colIdx(c.getAttribute("r")), // Coluna 0-based
+                tp = c.getAttribute("t"),            // Tipo de dado (s = shared string, inlineStr, etc.)
+                v = c.getElementsByTagName("v")[0];  // Valor bruto do nó <v>
+
+              let val = "";
+              if (tp === "s") val = v ? (sst[+v.textContent] ?? "") : "";
+              else if (tp === "inlineStr")
+                val = [...c.getElementsByTagName("t")]
+                  .map((x) => x.textContent)
+                  .join("");
+              else val = v ? v.textContent : "";
+
+              // Preenche lacunas de colunas vazias anteriores para manter a indexação alinhada
+              while (r.length < i) r.push("");
+              r[i] = val;
+            }
+            linhas.push(r);
+          }
+          abas[nome] = linhas;
+          ordem.push(nome);
+        }
+        return { abas, ordem };
+      }
+
+      /**
+       * Converte uma matriz bidimensional (linhas e colunas) em uma lista de objetos JavaScript estruturados,
+       * utilizando os valores da primeira linha como chaves dos objetos.
+       *
+       * @param {Array<Array<any>>} linhas - Matriz onde a linha 0 representa o cabeçalho.
+       * @returns {Array<Object>} Lista de registros chave-valor.
+       * @example
+       * comoObjetos([["Nome", "Idade"], ["Ana", "25"]]) // -> [{ Nome: "Ana", Idade: "25" }]
+       */
+      function comoObjetos(linhas) {
+        if (!linhas || !linhas.length) return [];
+        const h = linhas[0].map((x) => String(x).trim());
+        return linhas
+          .slice(1)
+          .filter((r) => r.some((c) => String(c).trim() !== "")) // Remove linhas totalmente vazias
+          .map((r) => {
+            const o = {};
+            h.forEach((k, i) => (o[k] = r[i] ?? ""));
+            return o;
+          });
+      }
+
+      /* ============================================================================
+       * 2. CAMADA DE EXPORTAÇÃO: GERADOR BINÁRIO ZIP E OPENXML (.XLSX)
+       * ============================================================================ */
+
+      /** Tabela pré-calculada de consulta polinomial para aceleração do cálculo de CRC32 */
+      const CRC = (() => {
+        const t = new Uint32Array(256);
+        for (let n = 0; n < 256; n++) {
+          let c = n;
+          for (let k = 0; k < 8; k++)
+            c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+          t[n] = c >>> 0;
+        }
+        return t;
+      })();
+
+      /**
+       * Calcula o checksum de redundância cíclica de 32 bits (CRC32) de um buffer de bytes.
+       * Necessário para a integridade exigida pela especificação do formato PKZIP.
+       *
+       * @param {Uint8Array} b - Vetor de bytes a ter o hash calculado.
+       * @returns {number} Inteiro sem sinal de 32 bits representando o CRC32.
+       */
+      const crc32 = (b) => {
+        let c = 0xffffffff;
+        for (let i = 0; i < b.length; i++)
+          c = CRC[(c ^ b[i]) & 255] ^ (c >>> 8);
+        return (c ^ 0xffffffff) >>> 0;
+      };
+
+      /**
+       * Cria um arquivo binário ZIP completo em memória a partir de uma lista de arquivos.
+       * Monta os Local File Headers (0x04034b50), Central Directory (0x02014b50)
+       * e o End of Central Directory (0x06054b50), sem compressão adicional (Store / método 0)
+       * garantindo velocidade máxima de empacotamento no navegador.
+       *
+       * @param {Array<{nome: string, bytes: Uint8Array}>} arquivos - Arquivos a incluir no ZIP.
+       * @returns {Blob} Objeto Blob contendo o arquivo ZIP binário pronto para download.
+       */
+      function criarZip(arquivos) {
+        const partes = [],
+          cd = [];
+        let off = 0;
+
+        // Converte data e hora atuais para o formato MS-DOS (armazenamento em bitfields exigido pelo ZIP)
+        const d = new Date(),
+          hora =
+            (d.getHours() << 11) |
+            (d.getMinutes() << 5) |
+            (d.getSeconds() >> 1),
+          dia =
+            ((d.getFullYear() - 1980) << 9) |
+            ((d.getMonth() + 1) << 5) |
+            d.getDate();
+
+        for (const a of arquivos) {
+          const nome = enc.encode(a.nome),
+            crc = crc32(a.bytes),
+            L = new DataView(new ArrayBuffer(30)); // Local File Header (30 bytes fixos)
+
+          L.setUint32(0, 0x04034b50, true);       // Assinatura de cabeçalho local
+          L.setUint16(4, 20, true);               // Versão mínima necessária (2.0)
+          L.setUint16(6, 0x0800, true);           // Flags de uso geral (bit 11 = UTF-8 no nome do arquivo)
+          L.setUint16(8, 0, true);                // Método de compressão (0 = Store / Sem compressão)
+          L.setUint16(10, hora, true);            // Hora MS-DOS
+          L.setUint16(12, dia, true);             // Data MS-DOS
+          L.setUint32(14, crc, true);             // Checksum CRC-32
+          L.setUint32(18, a.bytes.length, true);  // Tamanho comprimido
+          L.setUint32(22, a.bytes.length, true);  // Tamanho descomprimido
+          L.setUint16(26, nome.length, true);     // Comprimento do nome do arquivo
+          partes.push(new Uint8Array(L.buffer), nome, a.bytes);
+
+          // Central Directory Header (46 bytes fixos)
+          const C = new DataView(new ArrayBuffer(46));
+          C.setUint32(0, 0x02014b50, true);       // Assinatura do diretório central
+          C.setUint16(4, 20, true);               // Versão que criou
+          C.setUint16(6, 20, true);               // Versão necessária para extrair
+          C.setUint16(8, 0x0800, true);           // Flags UTF-8
+          C.setUint16(12, hora, true);            // Hora
+          C.setUint16(14, dia, true);             // Data
+          C.setUint32(16, crc, true);             // CRC-32
+          C.setUint32(20, a.bytes.length, true);  // Tamanho comprimido
+          C.setUint32(24, a.bytes.length, true);  // Tamanho descomprimido
+          C.setUint16(28, nome.length, true);     // Comprimento do nome
+          C.setUint32(42, off, true);             // Offset relativo do cabeçalho local
+          cd.push(new Uint8Array(C.buffer), nome);
+
+          off += 30 + nome.length + a.bytes.length;
+        }
+
+        // End of Central Directory Record (22 bytes)
+        const tam = cd.reduce((s, x) => s + x.length, 0),
+          E = new DataView(new ArrayBuffer(22));
+        E.setUint32(0, 0x06054b50, true);         // Assinatura de fim do diretório central
+        E.setUint16(8, arquivos.length, true);    // Entradas no diretório neste disco
+        E.setUint16(10, arquivos.length, true);   // Total de entradas no diretório
+        E.setUint32(12, tam, true);               // Tamanho do diretório central
+        E.setUint32(16, off, true);               // Offset do início do diretório central
+
+        return new Blob([...partes, ...cd, new Uint8Array(E.buffer)]);
+      }
+
+      /**
+       * Escapa caracteres especiais de XML para evitar quebras sintáticas nos arquivos gerados.
+       * @param {any} s - Texto a ser sanitizado.
+       * @returns {string} Texto seguro para injeção em tags XML.
+       */
+      const esc = (s) =>
+        String(s)
+          .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "") // Remove caracteres de controle ASCII inválidos
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+
+      /**
+       * Converte um índice de coluna numérico (0-based) na letra correspondente do Excel.
+       * Exemplo: 0 -> "A", 1 -> "B", 25 -> "Z", 26 -> "AA".
+       *
+       * @param {number} i - Índice da coluna (0-based).
+       * @returns {string} Identificador alfabético da coluna.
+       */
+      const letra = (i) => {
+        let s = "";
+        i++;
+        while (i > 0) {
+          const m = (i - 1) % 26;
+          s = String.fromCharCode(65 + m) + s;
+          i = Math.floor((i - 1) / 26);
+        }
+        return s;
+      };
+
+      /**
+       * Constrói e empacota um arquivo Excel nativo (.xlsx) a partir de uma lista de tabelas/abas.
+       * Gera os metadados OpenXML ([Content_Types].xml, _rels, workbook.xml, styles.xml e worksheets),
+       * aplicando estilos como cabeçalho em negrito, colunas com larguras autoajustadas e painel superior congelado.
+       *
+       * @async
+       * @param {Array<{nome: string, cab: string[], linhas: Array<Array<any>>}>} abas - Abas do Excel a gerar.
+       * @returns {Promise<Blob>} Blob binário contendo a pasta de trabalho .xlsx pronta para download.
+       */
+      async function criarXlsx(abas) {
+        const NS =
+          'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"';
+        const arqs = [];
+        const add = (nome, txt) => arqs.push({ nome, bytes: enc.encode(txt) });
+
+        // 1. Tipos de Conteúdo MIME
+        add(
+          "[Content_Types].xml",
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
+            abas
+              .map(
+                (_, i) =>
+                  `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`,
+              )
+              .join("") +
+            "</Types>",
+        );
+
+        // 2. Relacionamento Raiz
+        add(
+          "_rels/.rels",
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>',
+        );
+
+        // 3. Estrutura do Workbook
+        add(
+          "xl/workbook.xml",
+          `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook ${NS} xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>` +
+            abas
+              .map(
+                (a, i) =>
+                  `<sheet name="${esc(a.nome.replace(/[\[\]:*?\/\\]/g, "_").slice(0, 31))}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`,
+              )
+              .join("") +
+            "</sheets></workbook>",
+        );
+
+        // 4. Relacionamentos do Workbook
+        add(
+          "xl/_rels/workbook.xml.rels",
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+            abas
+              .map(
+                (_, i) =>
+                  `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`,
+              )
+              .join("") +
+            `<Relationship Id="rId${abas.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`,
+        );
+
+        // 5. Folha de Estilos (Cabeçalho em negrito com fonte Calibri)
+        add(
+          "xl/styles.xml",
+          `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet ${NS}><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs></styleSheet>`,
+        );
+
+        // 6. Planilhas individuais (worksheets)
+        abas.forEach((a, i) => {
+          const todas = [a.cab, ...a.linhas];
+
+          // Calcula a largura ideal das colunas avaliando os primeiros 60 registros
+          const larg = a.cab.map((_, c) =>
+            Math.min(
+              60,
+              Math.max(
+                12,
+                ...todas.slice(0, 60).map((r) => String(r[c] ?? "").length + 2),
+              ),
+            ),
+          );
+
+          // Congela a 1ª linha (cabeçalho) com o nó <pane ySplit="1" state="frozen"/>
+          let x =
+            `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet ${NS}><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>` +
+            larg
+              .map(
+                (w, c) =>
+                  `<col min="${c + 1}" max="${c + 1}" width="${w}" customWidth="1"/>`,
+              )
+              .join("") +
+            "</cols><sheetData>";
+
+          // Serializa cada linha e cada célula
+          todas.forEach((r, ri) => {
+            x += `<row r="${ri + 1}">`;
+            r.forEach((v, c) => {
+              const ref = letra(c) + (ri + 1),
+                est = ri === 0 ? ' s="1"' : ""; // Estilo 1 = negrito no cabeçalho
+              if (v === null || v === undefined || v === "") return;
+              if (typeof v === "number" && isFinite(v))
+                x += `<c r="${ref}"${est}><v>${v}</v></c>`;
+              else if (typeof v === "boolean")
+                x += `<c r="${ref}" t="b"${est}><v>${v ? 1 : 0}</v></c>`;
+              else
+                x += `<c r="${ref}" t="inlineStr"${est}><is><t xml:space="preserve">${esc(v)}</t></is></c>`;
+            });
+            x += "</row>";
+          });
+          add(
+            `xl/worksheets/sheet${i + 1}.xml`,
+            x + "</sheetData></worksheet>",
+          );
+        });
+        return criarZip(arqs);
+      }
+
+      /* ============================================================================
+       * 3. FUNÇÕES UTILITÁRIAS DE PARSING, MATEMÁTICA E DATAS
+       * ============================================================================ */
+
+      /** Arredonda número para duas casas decimais evitando erros de ponto flutuante */
+      const r2 = (x) => Math.round((x + Number.EPSILON) * 100) / 100;
+
+      /**
+       * Converte valores de moeda ou números vindos das planilhas em ponto flutuante válido.
+       * Suporta formato brasileiro com vírgula (ex.: "1.250,50") e notação padrão (ex.: "1250.50").
+       *
+       * @param {any} x - Valor da célula (string, número, nulo ou indefinido).
+       * @returns {number} Valor numérico convertido ou 0 caso inválido/vazio.
+       */
+      function num(x) {
+        if (x === null || x === undefined) return 0;
+        const s = String(x).trim();
+        if (s === "") return 0;
+        const v = s.includes(",")
+          ? parseFloat(s.replace(/\./g, "").replace(",", "."))
+          : parseFloat(s);
+        return isNaN(v) ? 0 : v;
+      }
+
+      /** Converte objeto Date em chave numérica inteira YYYYMMDD (ex.: 20260915) */
+      const ymd = (d) =>
+        d.getUTCFullYear() * 10000 +
+        (d.getUTCMonth() + 1) * 100 +
+        d.getUTCDate();
+
+      /** Converte objeto Date em string no padrão ISO YYYY-MM-DD */
+      const iso = (d) => d.toISOString().slice(0, 10);
+
+      /* ============================================================================
+       * 4. MOTOR PRINCIPAL DO ETL (MODELAGEM DIMENSIONAL KIMBALL)
+       * ============================================================================
+       * FIDELIDADE AO MODELO
+       * Este motor carrega EXATAMENTE as tabelas do diagrama
+       * "ModelagemDimensional_Etapa05_v2.drawio" (versão revisada pela professora):
+       *
+       *   ESTRELA 1 ........ FATO_PEDIDO  -> DIM_TEMPO, DIM_CANAL, DIM_STATUS,
+       *                                      DIM_PAGAMENTO, DIM_TIPO_ENTREGA
+       *   ESTRELA 2 ........ FATO_META    -> DIM_TEMPO
+       *
+       * Fora do modelo (e, portanto, NÃO carregados): itens/produtos vendidos
+       * (FATO_ITEM_PEDIDO e DIM_PRODUTO foram retirados; as exportações das
+       * plataformas não trazem produtos por pedido), conciliação financeira do
+       * iFood (FATO_LANCAMENTO), hora/turno do pedido e planilha de custos.
+       * Cada coluna das tabelas de saída existe no diagrama, com o mesmo nome.
+       * ========================================================================== */
+
+      /**
+       * Executa o pipeline completo de transformação e carga dos dados no modelo Star Schema.
+       *
+       * JOBS EXECUTADOS (numeração sequencial):
+       * - JOB 0: Extração e deduplicação dos pedidos brutos (iFood e 99Food).
+       * - JOB 1: DIM_TEMPO  - calendário diário contínuo.
+       * - JOB 2: DIM_CANAL, DIM_STATUS, DIM_PAGAMENTO, DIM_TIPO_ENTREGA.
+       * - JOB 3: Transformação dos pedidos do iFood  (medidas padronizadas + ZERA FATOS).
+       * - JOB 4: Transformação dos pedidos do 99Food (medidas padronizadas + ZERA FATOS).
+       * - JOB 5: Carga da FATO_PEDIDO (substituição por chaves estrangeiras).
+       * - JOB 6: Criação da FATO_META (estrutura do modelo; sem fonte nas plataformas).
+       * - JOB 7: Validação da carga: 3 conferências contábeis + 3 conferências de integridade.
+       *
+       * @param {Object} src - Fontes de dados {ifood, n99}: linhas dos relatórios "Dados do pedido".
+       * @returns {Object} {tabelas, log, resumo, validacao, problemas, falhas}.
+       * @throws {Error} Se não for possível ler as datas dos pedidos.
+       */
+      function executarETL(src) {
+        const LOG = [],
+          PROB = [],
+          VAL = [];
+
+        /** Retorna hora formatada HH:MM:SS para carimbo no log de execução */
+        const horaLog = () => new Date().toTimeString().slice(0, 8);
+        const log = (m) => LOG.push(`[${horaLog()}] ${m}`);
+
+        /** Registra um problema de Data Quality na tabela de controle */
+        const problema = (fonte, desc, trat) => {
+          PROB.push([fonte, desc, trat]);
+          log(`PROBLEMA [${fonte}] ${desc} -> ${trat}`);
+        };
+
+        /** Registra o resultado de uma validação automatizada */
+        const valida = (teste, esp, obt, ok) => {
+          VAL.push([teste, String(esp), String(obt), ok ? "OK" : "FALHA"]);
+          log(
+            `VALIDACAO ${ok ? "OK " : "FALHA"} | ${teste} | esperado=${esp} obtido=${obt}`,
+          );
+        };
+
+        /**
+         * Deduplica linhas por chave primária, mantendo a 1ª ocorrência encontrada
+         * e registrando alerta de qualidade caso encontre IDs duplicados.
+         */
+        const unico = (linhas, chave, nome) => {
+          const v = new Set(),
+            o = [];
+          for (const l of linhas) {
+            if (v.has(l[chave])) continue;
+            v.add(l[chave]);
+            o.push(l);
+          }
+          if (o.length < linhas.length)
+            problema(
+              nome,
+              "IDs de pedido duplicados",
+              "mantida a primeira ocorrência",
+            );
+          return o;
+        };
+
+        log("INICIO DO ETL - DeliView (modelo dimensional Etapa 5 v2)");
+
+        // ========================================================================
+        // JOB 0 - EXTRAÇÃO & DEDUPLICAÇÃO
+        // Entrada : relatórios "Dados do pedido" do iFood e do 99Food.
+        // Saída   : listas de pedidos sem IDs repetidos (1 linha = 1 pedido).
+        // Regra   : se o mesmo pedido aparecer em dois arquivos (períodos que se
+        //           sobrepõem), vale a primeira ocorrência.
+        // ========================================================================
+        log("JOB 0 - EXTRACAO");
+        const ifood = unico(src.ifood, "ID COMPLETO DO PEDIDO", "iFood pedido"),
+          n99 = unico(src.n99, "ID do pedido", "99Food pedido");
+        log(`  ifood_pedidos: ${ifood.length} | 99_pedidos: ${n99.length}`);
+
+        /** Converte data do iFood (DD/MM/YYYY hh:mm:ss) em chave inteira YYYYMMDD */
+        const dIfood = (s) => {
+          const m = String(s).match(/(\d{2})\/(\d{2})\/(\d{4})/);
+          return m ? +(m[3] + m[2] + m[1]) : null;
+        };
+
+        /** Converte data da 99Food (YYYYMMDD ou YYYY-MM-DD) em chave inteira YYYYMMDD */
+        const d99 = (s) => {
+          const m = String(s)
+            .trim()
+            .match(/^(\d{4})(\d{2})(\d{2})/);
+          return m ? +(m[1] + m[2] + m[3]) : null;
+        };
+
+        // Consolida todas as datas encontradas para calcular a abrangência temporal
+        const idsTempo = [
+          ...ifood.map((r) => dIfood(r["DATA E HORA DO PEDIDO"])),
+          ...n99.map((r) => d99(r["Data"])),
+        ].filter(Boolean);
+
+        if (!idsTempo.length)
+          throw new Error("não foi possível ler as datas dos pedidos");
+
+        // ========================================================================
+        // JOB 1 - DIM_TEMPO (calendário contínuo, grão = 1 dia)
+        // Colunas (iguais ao diagrama): ID_TEMPO, DATA, ANO, SEMESTRE, TRIMESTRE,
+        //   MES, NOME_MES, DIA, DIA_SEMANA, NOME_DIA_SEMANA, FIM_DE_SEMANA.
+        // Cobre de 01/01 do menor ano até 31/12 do maior ano encontrados nos
+        // pedidos, para que toda FK de FATO_PEDIDO/FATO_META encontre o seu dia.
+        // DIA_SEMANA: 1 = segunda-feira ... 7 = domingo. FIM_DE_SEMANA = sáb/dom.
+        // ========================================================================
+        const anoMin = Math.floor(Math.min(...idsTempo) / 10000),
+          anoMax = Math.floor(Math.max(...idsTempo) / 10000);
+        log(`JOB 1 - DIM_TEMPO (${anoMin} a ${anoMax})`);
+
+        const meses = [
+          "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+          "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
+        ];
+        const dias = [
+          "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira",
+          "sexta-feira", "sábado", "domingo",
+        ];
+        const tempo = [];
+
+        for (
+          let d = new Date(Date.UTC(anoMin, 0, 1));
+          d <= new Date(Date.UTC(anoMax, 11, 31));
+          d = new Date(d.getTime() + 864e5) // +24 h
+        ) {
+          const ds = ((d.getUTCDay() + 6) % 7) + 1, // 1 = segunda ... 7 = domingo
+            m = d.getUTCMonth() + 1;
+          tempo.push([
+            ymd(d),               // ID_TEMPO (PK, ex.: 20260915)
+            iso(d),               // DATA
+            d.getUTCFullYear(),   // ANO
+            m <= 6 ? 1 : 2,       // SEMESTRE
+            Math.ceil(m / 3),     // TRIMESTRE
+            m,                    // MES
+            meses[m - 1],         // NOME_MES
+            d.getUTCDate(),       // DIA
+            ds,                   // DIA_SEMANA
+            dias[ds - 1],         // NOME_DIA_SEMANA
+            ds >= 6,              // FIM_DE_SEMANA
+          ]);
+        }
+
+        // ========================================================================
+        // JOB 2 - DIMENSÕES DE NEGÓCIO
+        // DIM_CANAL(ID_CANAL, NOME_CANAL, TIPO_CANAL)
+        // DIM_STATUS(ID_STATUS, STATUS, CONSIDERA_VENDA)
+        // DIM_PAGAMENTO(ID_PAGAMENTO, FORMA_PAGAMENTO)
+        // DIM_TIPO_ENTREGA(ID_TIPO_ENTREGA, TIPO_ENTREGA)
+        // ========================================================================
+        log("JOB 2 - DIM_CANAL, DIM_STATUS, DIM_PAGAMENTO, DIM_TIPO_ENTREGA");
+
+        /**
+         * Padroniza o texto livre da forma de pagamento em uma categoria comum aos
+         * dois canais (a mesma lista recomendada na Etapa 5).
+         *   iFood  : "Pgto via APP - Carteira Digital (Mastercard)" -> "Carteira Digital"
+         *            "Pgto na Entrega - Crédito (Visa)"             -> "Crédito"
+         *   99Food : "Pagamento em dinheiro" -> "Dinheiro"
+         *            "Pagamento online"      -> "Online (sem detalhe)"  (o relatório
+         *            não informa se foi Pix, cartão etc.)
+         * Qualquer texto novo, não previsto, cai em "Outros" e é avisado na conferência.
+         * O momento do pagamento (pelo app x na entrega) não faz parte do modelo.
+         */
+        const formaPagamento = (t) => {
+          const s = String(t ?? "").toLowerCase().trim();
+          if (s.includes("dinheiro")) return "Dinheiro";
+          if (s.includes("pix")) return "Pix";
+          if (s.includes("carteira digital")) return "Carteira Digital";
+          if (s.includes("app do banco")) return "App do Banco";
+          if (s.includes("crédito") || s.includes("credito")) return "Crédito";
+          if (s.includes("débito") || s.includes("debito")) return "Débito";
+          if (s === "pagamento online") return "Online (sem detalhe)";
+          return "Outros";
+        };
+
+        const canal = [
+          [1, "iFood", "Aplicativo de delivery"],
+          [2, "99Food", "Aplicativo de delivery"],
+        ];
+
+        const status = [
+          [1, "CONCLUIDO", true],  // CONSIDERA_VENDA = Sim: entra nos totais de faturamento
+          [2, "CANCELADO", false], // CONSIDERA_VENDA = Não
+        ];
+
+        // Uma linha por forma de pagamento distinta encontrada nos dois canais
+        const pagSet = new Set([
+          ...ifood.map((r) => formaPagamento(r["FORMA DE PAGAMENTO"])),
+          ...n99.map((r) => formaPagamento(r["Forma de pagamento"])),
+        ]);
+        const pag = [...pagSet].sort().map((f, i) => [i + 1, f]);
+        if (pagSet.has("Outros"))
+          problema(
+            "iFood / 99Food (Pagamento)",
+            "Forma de pagamento não reconhecida",
+            "Classificada como Outros; incluir a nova forma em formaPagamento().",
+          );
+
+        const ent = [
+          [1, "Entrega parceira iFood"],
+          [2, "Entrega da plataforma (99Food)"],
+        ];
+
+        // ========================================================================
+        // JOB 3 - TRANSFORMAÇÃO DOS PEDIDOS DO iFood
+        // Leva cada linha do relatório para as medidas padronizadas do modelo:
+        //   bruto   <- VALOR DOS ITENS (R$)                          (nunca é zerado)
+        //   desc    <- INCENTIVO PROMOCIONAL da LOJA + da REDE + do IFOOD
+        //   motoboy <- 0 (entrega parceira: a taxa de entrega é cobrada do cliente
+        //              e repassada à logística; não há custo de motoboy para a loja)
+        //   taxas   <- |TAXAS E COMISSOES (R$)|
+        //   pago    <- TOTAL PAGO PELO CLIENTE (R$)
+        //   liq     <- VALOR LIQUIDO (R$)
+        // Campos auxiliares (NÃO vão para o Data Mart; só servem à conferência do
+        // JOB 7): descLoja, descPlat, entregaCli e servico.
+        // ========================================================================
+        log("JOB 3 - TRANSFORMACAO iFood (pedidos)");
+        const A = ifood.map((x) => {
+          const sts = String(x["STATUS FINAL DO PEDIDO"]).trim().toUpperCase();
+          const isCanc = sts === "CANCELADO";
+
+          // REGRA ZERA FATOS: cancelado mantém só o bruto; todo o resto vai a 0
+          const z = (v) => (isCanc ? 0 : v);
+          const descLoja = z(
+            num(x["INCENTIVO PROMOCIONAL DA LOJA (R$)"]) +
+              num(x["INCENTIVO PROMOCIONAL DA REDE (R$)"]),
+          );
+          const descPlat = z(num(x["INCENTIVO PROMOCIONAL DO IFOOD (R$)"]));
+
+          return {
+            id: x["ID COMPLETO DO PEDIDO"],
+            canal: "iFood",
+            tempo: dIfood(x["DATA E HORA DO PEDIDO"]),
+            status: sts,
+            pag: formaPagamento(x["FORMA DE PAGAMENTO"]),
+            ent: "Entrega parceira iFood",
+            bruto: num(x["VALOR DOS ITENS (R$)"]),
+            desc: descLoja + descPlat,
+            motoboy: 0,
+            taxas: z(Math.abs(num(x["TAXAS E COMISSOES (R$)"]))),
+            pago: z(num(x["TOTAL PAGO PELO CLIENTE (R$)"])),
+            liq: z(num(x["VALOR LIQUIDO (R$)"])),
+            // auxiliares de conferência
+            descLoja,
+            descPlat,
+            entregaCli: z(num(x["TAXA DE ENTREGA PAGA PELO CLIENTE (R$)"])),
+            servico: z(num(x["TAXA DE SERVIÇO (R$)"])),
+          };
+        });
+
+        // ========================================================================
+        // JOB 4 - TRANSFORMAÇÃO DOS PEDIDOS DO 99Food
+        // Mesmas medidas, a partir das colunas do 99Food:
+        //   status  <- CANCELADO se "Horário do cancelamento" estiver preenchido
+        //   bruto   <- Preço original do item                        (nunca é zerado)
+        //   desc    <- Despesas de marketing (= Preço original - Receita de vendas;
+        //              "Recompensas da plataforma" é bônus à loja e não é desconto)
+        //   motoboy <- Custos logísticos
+        //   taxas   <- Despesas de comissão + Taxas de processamento de pagamento
+        //   pago    <- Receita de vendas
+        //   liq     <- Receita real da loja
+        // ========================================================================
+        log("JOB 4 - TRANSFORMACAO 99Food (pedidos)");
+        const B = n99.map((x) => {
+          const isCanc =
+            String(x["Horário do cancelamento"] ?? "").trim() !== "";
+          const z = (v) => (isCanc ? 0 : v); // REGRA ZERA FATOS
+
+          return {
+            id: x["ID do pedido"],
+            canal: "99Food",
+            tempo: d99(x["Data"]),
+            status: isCanc ? "CANCELADO" : "CONCLUIDO",
+            pag: formaPagamento(x["Forma de pagamento"]),
+            ent: "Entrega da plataforma (99Food)",
+            bruto: num(x["Preço original do item"]),
+            desc: z(num(x["Despesas de marketing"])),
+            motoboy: z(num(x["Custos logísticos"])),
+            taxas: z(
+              num(x["Despesas de comissão"]) +
+                num(x["Taxas de processamento de pagamento"]),
+            ),
+            pago: z(num(x["Receita de vendas"])),
+            liq: z(num(x["Receita real da loja"])),
+          };
+        });
+
+        problema(
+          "99Food / iFood (Cancelados)",
+          "Pedidos cancelados distorciam agregacoes na fato",
+          "Regra ZERA FATOS aplicada a todas as metricas (exceto bruto) nos dois canais.",
+        );
+
+        // ========================================================================
+        // JOB 5 - CARGA DA FATO_PEDIDO (Estrela 1)
+        // Grão: 1 linha por pedido. ID_PEDIDO é a chave (PK) e dimensão degenerada.
+        // Cada texto é trocado pela chave substituta da dimensão (FK).
+        // Colunas, na ordem do diagrama: ID_PEDIDO, ID_CANAL, ID_TEMPO, ID_STATUS,
+        //   ID_PAGAMENTO, ID_TIPO_ENTREGA, VALOR_BRUTO_PEDIDO, VALOR_DESCONTOS,
+        //   TAXA_MOTOBOY, VALOR_TAXAS, VALOR_TOTAL_PAGO, VALOR_LIQUIDO.
+        // ========================================================================
+        log("JOB 5 - CARGA DA FATO_PEDIDO");
+        const base = [...A, ...B];
+
+        // Dicionários chave de negócio -> chave substituta (FK)
+        const idCanal = Object.fromEntries(canal.map((c) => [c[1], c[0]])),
+          idSt = Object.fromEntries(status.map((s) => [s[1], s[0]])),
+          idPag = Object.fromEntries(pag.map((p) => [p[1], p[0]])),
+          idEnt = Object.fromEntries(ent.map((e) => [e[1], e[0]]));
+
+        const fp = base.map((b) => [
+          b.id,
+          idCanal[b.canal],
+          b.tempo,
+          idSt[b.status],
+          idPag[b.pag],
+          idEnt[b.ent],
+          r2(b.bruto),
+          r2(b.desc),
+          r2(b.motoboy),
+          r2(b.taxas),
+          r2(b.pago),
+          r2(b.liq),
+        ]);
+
+        // ========================================================================
+        // JOB 6 - FATO_META (Estrela 2)
+        // Colunas do diagrama: ID_META, ID_TEMPO, QUANTIDADE, META_VALOR.
+        // As exportações do iFood e do 99Food NÃO trazem metas. A tabela é criada
+        // vazia, com a estrutura do modelo, e deve ser preenchida quando o parceiro
+        // informar as metas (por dia/mês). Liga-se às vendas pela DIM_TEMPO.
+        // ========================================================================
+        log("JOB 6 - FATO_META (estrutura do modelo, sem carga)");
+        const fm = [];
+        problema(
+          "FATO_META",
+          "As plataformas não exportam metas de venda",
+          "Tabela criada vazia, com a estrutura do modelo; carga manual quando o parceiro definir as metas.",
+        );
+
+        // ========================================================================
+        // JOB 7 - VALIDAÇÃO DA CARGA
+        // (a) Conferências contábeis: as medidas devem fechar a conta de cada canal.
+        // (b) Conferências de integridade: o resultado deve respeitar o modelo.
+        // ========================================================================
+        log("JOB 7 - VALIDACAO DA CARGA");
+
+        // (a1) iFood: Líquido = Bruto - Desconto da loja - Taxas
+        const I = A.filter((b) => b.status === "CONCLUIDO");
+        let d = I.filter(
+          (b) => Math.abs(b.bruto - b.descLoja - b.taxas - b.liq) > 0.011,
+        ).length;
+        valida(
+          "iFood: liquido = itens (bruto) - desconto loja - taxas",
+          0, d, d === 0,
+        );
+
+        // (a2) iFood: Pago pelo cliente = Bruto + Entrega + Serviço - Descontos totais
+        d = I.filter(
+          (b) =>
+            Math.abs(b.bruto + b.entregaCli + b.servico - b.desc - b.pago) >
+            0.011,
+        ).length;
+        valida(
+          "iFood: pago cliente = itens + entrega + servico - descontos totais",
+          0, d, d === 0,
+        );
+
+        // (a3) 99Food: Líquido = Receita de vendas - Taxas - Custos logísticos (TAXA_MOTOBOY)
+        const c99 = B.filter((b) => b.status === "CONCLUIDO");
+        d = c99.filter(
+          (b) => Math.abs(b.pago - b.taxas - b.motoboy - b.liq) > 0.011,
+        ).length;
+        valida(
+          "99Food: liquido = receita de vendas - taxas e comissoes - custos logísticos",
+          0, d, d === 0,
+        );
+
+        // (b1) Chave primária: ID_PEDIDO não pode se repetir na FATO_PEDIDO
+        d = fp.length - new Set(fp.map((r) => r[0])).size;
+        valida("FATO_PEDIDO: ID_PEDIDO unico (PK)", 0, d, d === 0);
+
+        // (b2) Integridade referencial: toda FK deve existir na sua dimensão
+        const ids = (t, i = 0) => new Set(t.map((r) => r[i]));
+        const sT = ids(tempo), sC = ids(canal), sS = ids(status),
+          sP = ids(pag), sE = ids(ent);
+        d = fp.filter(
+          (r) =>
+            !sC.has(r[1]) || !sT.has(r[2]) || !sS.has(r[3]) ||
+            !sP.has(r[4]) || !sE.has(r[5]),
+        ).length;
+        valida(
+          "FATO_PEDIDO: toda FK existe na dimensao (canal, tempo, status, pagamento, entrega)",
+          0, d, d === 0,
+        );
+
+        // (b3) ZERA FATOS: cancelado deve ter descontos, motoboy, taxas, pago e líquido = 0
+        d = fp.filter(
+          (r) => r[3] === 2 && [7, 8, 9, 10, 11].some((i) => r[i] !== 0),
+        ).length;
+        valida(
+          "FATO_PEDIDO: cancelados com medidas zeradas (exceto valor bruto)",
+          0, d, d === 0,
+        );
+
+        // Resumo financeiro exibido no painel (somente pedidos concluídos)
+        const resumo = {};
+        for (const c of ["iFood", "99Food"]) {
+          const t = base.filter((b) => b.canal === c),
+            v = t.filter((b) => b.status === "CONCLUIDO");
+          resumo[c] = {
+            pedidos: t.length,
+            concluidos: v.length,
+            cancelados: t.length - v.length,
+            pago: v.reduce((a, b) => a + b.pago, 0),
+            taxas: v.reduce((a, b) => a + b.taxas, 0),
+          };
+        }
+
+        const falhas = VAL.filter((v) => v[3] === "FALHA").length;
+        log(`FIM DO ETL - ${VAL.length - falhas}/${VAL.length} validacoes OK`);
+
+        // Tabelas finais do Data Mart (nomes e colunas idênticos ao diagrama v2)
+        const tabelas = [
+          {
+            nome: "DIM_TEMPO",
+            cab: [
+              "ID_TEMPO", "DATA", "ANO", "SEMESTRE", "TRIMESTRE", "MES",
+              "NOME_MES", "DIA", "DIA_SEMANA", "NOME_DIA_SEMANA", "FIM_DE_SEMANA",
+            ],
+            linhas: tempo,
+          },
+          {
+            nome: "DIM_CANAL",
+            cab: ["ID_CANAL", "NOME_CANAL", "TIPO_CANAL"],
+            linhas: canal,
+          },
+          {
+            nome: "DIM_STATUS",
+            cab: ["ID_STATUS", "STATUS", "CONSIDERA_VENDA"],
+            linhas: status,
+          },
+          {
+            nome: "DIM_PAGAMENTO",
+            cab: ["ID_PAGAMENTO", "FORMA_PAGAMENTO"],
+            linhas: pag,
+          },
+          {
+            nome: "DIM_TIPO_ENTREGA",
+            cab: ["ID_TIPO_ENTREGA", "TIPO_ENTREGA"],
+            linhas: ent,
+          },
+          {
+            nome: "FATO_PEDIDO",
+            cab: [
+              "ID_PEDIDO", "ID_CANAL", "ID_TEMPO", "ID_STATUS", "ID_PAGAMENTO",
+              "ID_TIPO_ENTREGA", "VALOR_BRUTO_PEDIDO", "VALOR_DESCONTOS",
+              "TAXA_MOTOBOY", "VALOR_TAXAS", "VALOR_TOTAL_PAGO", "VALOR_LIQUIDO",
+            ],
+            linhas: fp,
+          },
+          {
+            nome: "FATO_META",
+            cab: ["ID_META", "ID_TEMPO", "QUANTIDADE", "META_VALOR"],
+            linhas: fm,
+          },
+          {
+            nome: "PROBLEMAS_E_TRATAMENTOS",
+            cab: ["FONTE", "PROBLEMA ENCONTRADO", "TRATAMENTO NO ETL"],
+            linhas: PROB,
+          },
+          {
+            nome: "VALIDACAO_DA_CARGA",
+            cab: ["TESTE", "ESPERADO", "OBTIDO", "RESULTADO"],
+            linhas: VAL,
+          },
+        ];
+
+        return {
+          tabelas,
+          log: LOG,
+          resumo,
+          validacao: VAL,
+          problemas: PROB,
+          falhas,
+        };
+      }
+
+      /* ============================================================================
+       * 5. CAMADA DE CONTROLE DE INTERFACE (DOM, EVENTOS E VISUALIZAÇÃO)
+       * ============================================================================ */
+
+      /**
+       * Metadados dos 2 arquivos obrigatórios para a execução do ETL.
+       * O modelo v2 só é alimentado pelos relatórios "Dados do pedido" dos dois canais.
+       */
+      const TIPOS = [
+        {
+          id: "ifood",
+          nome: "Pedidos do iFood",
+          dica: "Relatório “Dados do pedido” do iFood",
+          multi: true,
+        },
+        {
+          id: "n99",
+          nome: "Pedidos do 99Food",
+          dica: "Relatório “Dados do pedido” do 99Food",
+          multi: true,
+        },
+      ];
+
+      /**
+       * Relatórios reconhecidos, mas que NÃO fazem parte do modelo v2 (não alimentam
+       * nenhuma tabela). Se forem soltos na tela, são ignorados com um aviso claro.
+       */
+      const IGNORADOS = {
+        conc: "Conciliação do iFood (FATO_LANCAMENTO não existe no modelo v2)",
+        loja: "Dados da loja do 99Food (não existe fato de loja no modelo v2)",
+        custos: "Planilha de custos (DIM_PRODUTO foi retirada do modelo v2)",
+      };
+
+      /** Estrutura em memória que armazena os arquivos carregados pelo usuário */
+      const recebidos = {
+        ifood: [],
+        n99: [],
+      };
+
+      /** Armazena o retorno do motor ETL após a execução */
+      let resultado = null;
+
+      /** Helper para seleção rápida de elementos do DOM por ID */
+      const $ = (id) => document.getElementById(id);
+
+      /**
+       * Inspeciona os cabeçalhos de um arquivo Excel e identifica automaticamente a qual relatório ele pertence.
+       *
+       * @param {Object} wb - Pasta de trabalho retornada por lerXlsx().
+       * @returns {string|null} "ifood", "n99", "conc", "loja", "custos" ou null se não reconhecido.
+       */
+      function classificar(wb) {
+        if (wb.abas["Cardápio"] && wb.abas["Bebidas"]) return "custos";
+        const cab = (wb.abas[wb.ordem[0]]?.[0] || []).map((x) =>
+          String(x).trim(),
+        );
+        const tem = (...c) => c.every((x) => cab.includes(x));
+        if (tem("ID COMPLETO DO PEDIDO", "VALOR LIQUIDO (R$)")) return "ifood";
+        if (tem("pedido_associado_ifood", "tipo_lancamento")) return "conc";
+        if (tem("ID do pedido", "Horário do cancelamento")) return "n99";
+        if (tem("Total de vendas realizadas", "Receita total de vendas"))
+          return "loja";
+        return null;
+      }
+
+      /**
+       * Renderiza no DOM o status dos 2 arquivos obrigatórios (marca verde para presentes, dica para pendentes)
+       * e habilita o botão principal de execução somente quando os dois estiverem carregados.
+       */
+      function desenharLista() {
+        $("lista").innerHTML = TIPOS.map((t) => {
+          const r = recebidos[t.id];
+          const ok = r.length > 0;
+          return `<li class="${ok ? "ok" : ""}"><span class="marca"></span><div><div class="nome">${t.nome}</div><div class="det">${ok ? r.map((x) => x.nome).join(", ") : t.dica}</div></div>${ok ? `<button class="x" data-t="${t.id}">remover</button>` : "<span></span>"}</li>`;
+        }).join("");
+
+        // Vincula a ação de remoção aos botões individuais
+        $("lista")
+          .querySelectorAll("button.x")
+          .forEach(
+            (b) =>
+              (b.onclick = () => {
+                recebidos[b.dataset.t] = [];
+                resultado = null;
+                $("resultado").classList.add("oculto");
+                desenharLista();
+              }),
+          );
+
+        // Habilita o botão se os 2 relatórios de pedidos estiverem presentes
+        $("rodar").disabled = !(recebidos.ifood.length && recebidos.n99.length);
+      }
+
+      /**
+       * Ponto de entrada para ingestão de arquivos soltos pelo usuário no dropzone ou selecionados via input.
+       *
+       * @async
+       * @param {FileList|File[]} files - Lista de arquivos selecionados.
+       */
+      async function receber(files) {
+        const avisos = [];
+        for (const f of files) {
+          try {
+            const wb = await lerXlsx(await f.arrayBuffer()),
+              tipo = classificar(wb);
+            if (!tipo) {
+              avisos.push(`<div class="aviso erro">“${html(f.name)}” não foi reconhecido.</div>`);
+              continue;
+            }
+            if (IGNORADOS[tipo]) {
+              avisos.push(
+                `<div class="aviso">“${html(f.name)}” foi reconhecido, mas não faz parte do modelo atual e foi ignorado: ${IGNORADOS[tipo]}.</div>`,
+              );
+              continue;
+            }
+            if (!recebidos[tipo].some((x) => x.nome === f.name))
+              recebidos[tipo].push({ nome: f.name, wb });
+          } catch (e) {
+            avisos.push(`<div class="aviso erro">Erro em “${html(f.name)}”: ${html(e.message)}</div>`);
+          }
+        }
+        $("avisos").innerHTML = avisos.join("");
+        resultado = null;
+        $("resultado").classList.add("oculto");
+        desenharLista();
+      }
+
+      /** Mescla múltiplos relatórios carregados em uma lista única de objetos associativos */
+      const juntar = (lista) =>
+        lista.flatMap((x) => comoObjetos(x.wb.abas[x.wb.ordem[0]]));
+
+      /** Formatadores regionais nativos para moeda Real (BRL) e inteiros com separadores de milhar */
+      const BRL = new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        }),
+        INT = new Intl.NumberFormat("pt-BR");
+
+      /** Sanitizador rápido de texto para injeção segura no DOM */
+      const html = (s) =>
+        String(s ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;");
+
+      /**
+       * Gera o HTML de uma tabela completa (thead e tbody) com classes de alinhamento numérico.
+       *
+       * @param {string[]} cab - Títulos das colunas.
+       * @param {Array<Array<any>>} linhas - Linhas de dados.
+       * @param {number[]} [numericas=[]] - Índices das colunas com números a alinhar à direita.
+       * @returns {string} String HTML pronta para ser injetada em <table>.
+       */
+      function tabelaHtml(cab, linhas, numericas = []) {
+        return (
+          "<thead><tr>" +
+          cab
+            .map(
+              (c, i) =>
+                `<th class="${numericas.includes(i) ? "n" : ""}">${html(c)}</th>`,
+            )
+            .join("") +
+          "</tr></thead><tbody>" +
+          linhas
+            .map(
+              (r) =>
+                "<tr>" +
+                r
+                  .map(
+                    (v, i) =>
+                      `<td class="${numericas.includes(i) ? "n" : ""}">${html(typeof v === "boolean" ? (v ? "Sim" : "Não") : v === null ? "" : v)}</td>`,
+                  )
+                  .join("") +
+                "</tr>",
+            )
+            .join("") +
+          "</tbody>"
+        );
+      }
+
+      /** Atualiza a tabela de prévia interativa no DOM com os primeiros 15 registros da tabela selecionada */
+      function mostrarPrevia() {
+        const t = resultado.tabelas.find((x) => x.nome === $("selt").value);
+        $("tprevia").innerHTML = tabelaHtml(t.cab, t.linhas.slice(0, 15));
+      }
+
+      /**
+       * Dispara o download de um arquivo no navegador utilizando uma URL de objeto temporária em memória.
+       *
+       * @param {Blob} blob - Conteúdo do arquivo a ser transferido.
+       * @param {string} nome - Nome do arquivo a ser salvo (ex.: "DataMart.xlsx").
+       */
+      function baixar(blob, nome) {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = nome;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000); // Libera o ponteiro de memória após 4s
+      }
+
+      /** Formata células para CSV no padrão brasileiro (delimitador ponto-e-vírgula e vírgula decimal) */
+      const csvCel = (v) => {
+        if (v === null || v === undefined) return "";
+        if (typeof v === "boolean") return v ? "VERDADEIRO" : "FALSO";
+        let s = typeof v === "number" ? String(v).replace(".", ",") : String(v);
+        return /[;"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+      };
+
+      /**
+       * Controlador acionado pelo clique no botão principal "Montar base de dados dimensional".
+       * Dispara a transformação dos dados, exibe os cards de KPI, renderiza a auditoria contábil
+       * e popula o seletor de tabelas para prévia imediata.
+       *
+       * @async
+       */
+      async function rodar() {
+        $("rodar").disabled = true;
+        $("avisos").innerHTML = "";
+        try {
+          // Extrai e consolida as fontes de dados em coleções limpas
+          const src = {
+            ifood: juntar(recebidos.ifood),
+            n99: juntar(recebidos.n99),
+          };
+          resultado = executarETL(src);
+        } catch (e) {
+          $("avisos").innerHTML =
+            `<div class="aviso erro">Erro no motor: ${html(e.message)}</div>`;
+          $("rodar").disabled = false;
+          return;
+        }
+
+        const R = resultado,
+          ok = R.validacao.length - R.falhas;
+        $("vtotal").textContent = `${ok} de ${R.validacao.length}`;
+        $("vtexto").textContent = R.falhas
+          ? "conferências aprovadas. Veja as que falharam abaixo antes de usar os dados."
+          : "conferências aprovadas. A base está pronta para uso.";
+
+        const a = R.resumo.iFood,
+          b = R.resumo["99Food"];
+
+        // Funções auxiliares para cálculo de percentual de cancelamento e ticket médio
+        const tx = (r) =>
+          r.pedidos
+            ? ((r.cancelados / r.pedidos) * 100).toFixed(1).replace(".", ",") +
+              "%"
+            : "-";
+        const tk = (r) =>
+          r.concluidos ? BRL.format(r.pago / r.concluidos) : "-";
+
+        const tot = {
+          concluidos: a.concluidos + b.concluidos,
+          pedidos: a.pedidos + b.pedidos,
+          cancelados: a.cancelados + b.cancelados,
+          pago: a.pago + b.pago,
+          taxas: a.taxas + b.taxas,
+        };
+
+        // 1. Tabela de Resumo Consolidado por Canal
+        $("tresumo").innerHTML = tabelaHtml(
+          ["", "iFood", "99Food", "Total"],
+          [
+            [
+              "Pedidos concluídos",
+              INT.format(a.concluidos),
+              INT.format(b.concluidos),
+              INT.format(tot.concluidos),
+            ],
+            [
+              "Cancelamentos",
+              `${INT.format(a.cancelados)} (${tx(a)})`,
+              `${INT.format(b.cancelados)} (${tx(b)})`,
+              `${INT.format(tot.cancelados)} (${tx(tot)})`,
+            ],
+            [
+              "Valor pago pelos clientes",
+              BRL.format(a.pago),
+              BRL.format(b.pago),
+              BRL.format(tot.pago),
+            ],
+            ["Ticket médio", tk(a), tk(b), tk(tot)],
+            [
+              "Taxas e comissões operacionais",
+              BRL.format(a.taxas),
+              BRL.format(b.taxas),
+              BRL.format(tot.taxas),
+            ],
+          ],
+          [1, 2, 3],
+        );
+
+        // 2. Tabela de Conferências Contábeis e Selos Visuais
+        $("tval").innerHTML = tabelaHtml(
+          ["Conferência", "Esperado", "Obtido", "Resultado"],
+          R.validacao,
+          [1, 2],
+        );
+        $("tval")
+          .querySelectorAll("tbody tr")
+          .forEach((tr, i) => {
+            const v = R.validacao[i][3];
+            tr.lastElementChild.innerHTML = `<span class="selo ${v === "OK" ? "ok" : "falha"}">${v === "OK" ? "OK" : "Falhou"}</span>`;
+          });
+
+        // 3. Tabela de Problemas e Tratamentos (Data Quality)
+        $("tprob").innerHTML = tabelaHtml(
+          ["Fonte", "Problema encontrado", "Tratamento"],
+          R.problemas,
+        );
+        $("tprob")
+          .querySelectorAll("td")
+          .forEach((td) => (td.style.whiteSpace = "normal"));
+
+        // 4. Registro de Log Textual
+        $("log").textContent = R.log.join("\n");
+
+        // 5. Seletor de Tabelas e Visualizador da Prévia
+        $("selt").innerHTML = R.tabelas
+          .map((t) => `<option>${t.nome}</option>`)
+          .join("");
+        $("selt").value = "FATO_PEDIDO";
+        mostrarPrevia();
+
+        // Exibe o painel de resultados e rola suavemente até ele
+        $("resultado").classList.remove("oculto");
+        $("rodar").disabled = false;
+        $("resultado").scrollIntoView({
+          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+            ? "auto"
+            : "smooth",
+          block: "start",
+        });
+      }
+
+      /* ============================================================================
+       * 6. VINCULAÇÃO DE EVENTOS DE USUÁRIO (DRAG & DROP, TECLADO E DOWNLOADS)
+       * ============================================================================ */
+
+      // Clique e navegação por teclado (Enter/Espaço) no dropzone
+      $("drop").onclick = () => $("arq").click();
+      $("drop").onkeydown = (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          $("arq").click();
+        }
+      };
+
+      // Manipulação de arquivos selecionados pelo input
+      $("arq").onchange = (e) => {
+        receber([...e.target.files]);
+        e.target.value = ""; // Reseta para permitir selecionar o mesmo arquivo novamente
+      };
+
+      // Efeitos visuais de hover no Drag & Drop
+      ["dragenter", "dragover"].forEach((ev) =>
+        $("drop").addEventListener(ev, (e) => {
+          e.preventDefault();
+          $("drop").classList.add("over");
+        }),
+      );
+      ["dragleave", "drop"].forEach((ev) =>
+        $("drop").addEventListener(ev, (e) => {
+          e.preventDefault();
+          $("drop").classList.remove("over");
+        }),
+      );
+
+      // Captura de soltura de arquivos na zona de drop
+      $("drop").addEventListener("drop", (e) =>
+        receber([...e.dataTransfer.files]),
+      );
+
+      // Impede o comportamento padrão do navegador de abrir arquivos arrastados fora da zona de drop
+      window.addEventListener("dragover", (e) => e.preventDefault());
+      window.addEventListener("drop", (e) => e.preventDefault());
+
+      // Vincula execução do ETL e alteração do seletor de prévia
+      $("rodar").onclick = rodar;
+      $("selt").onchange = mostrarPrevia;
+
+      // Botão 1: Exporta Data Mart completo em arquivo Excel (.xlsx) com múltiplas abas
+      $("bxlsx").onclick = async () =>
+        baixar(
+          await criarXlsx(resultado.tabelas),
+          "DataMart_DeliView_Dimensionado.xlsx",
+        );
+
+      // Botão 2: Exporta todas as tabelas em CSV individual (.zip) com separador ';' e BOM UTF-8
+      $("bcsv").onclick = () =>
+        baixar(
+          criarZip(
+            resultado.tabelas.map((t) => ({
+              nome: `${t.nome}.csv`,
+              bytes: enc.encode(
+                "\ufeff" + // Insere o Byte Order Mark (BOM) para compatibilidade com acentuação no Excel
+                  [t.cab, ...t.linhas]
+                    .map((r) => r.map(csvCel).join(";"))
+                    .join("\r\n"),
+              ),
+            })),
+          ),
+          "DataMart_DeliView_csv.zip",
+        );
+
+      // Botão 3: Exporta arquivo de log textual com o histórico de passos executados
+      $("blog").onclick = () =>
+        baixar(
+          new Blob([resultado.log.join("\n")], {
+            type: "text/plain;charset=utf-8",
+          }),
+          "log_execucao.txt",
+        );
+
+      /* ====================================================================
+       * CONTROLE DO POPUP / MODAL DE ORIENTAÇÕES E DOCUMENTAÇÃO
+       * ==================================================================== */
+      const abrirModalDoc = () => {
+        $("modal-doc").classList.add("aberto");
+        $("modal-doc").setAttribute("aria-hidden", "false");
+        $("btn-fechar-doc").focus();
+        document.body.style.overflow = "hidden"; // Evita rolagem da página ao fundo
+      };
+
+      const fecharModalDoc = () => {
+        $("modal-doc").classList.remove("aberto");
+        $("modal-doc").setAttribute("aria-hidden", "true");
+        document.body.style.overflow = ""; // Restaura a rolagem da página
+      };
+
+      // Disparadores de abertura (botão no topo e botão inline)
+      $("btn-doc")?.addEventListener("click", abrirModalDoc);
+      $("btn-doc-lead")?.addEventListener("click", abrirModalDoc);
+
+      // Disparadores de fechamento (botão 'X' e botão no rodapé)
+      $("btn-fechar-doc")?.addEventListener("click", fecharModalDoc);
+      $("btn-fechar-doc-rodape")?.addEventListener("click", fecharModalDoc);
+
+      // Fecha ao clicar fora do cartão (no fundo translúcido)
+      $("modal-doc")?.addEventListener("click", (e) => {
+        if (e.target === $("modal-doc")) fecharModalDoc();
+      });
+
+      // Fecha ao pressionar a tecla Escape
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && $("modal-doc")?.classList.contains("aberto")) {
+          fecharModalDoc();
+        }
+      });
+
+      // Inicialização da interface: monta os 2 slots de arquivos vazios ao carregar
+      desenharLista();
+    </script>
+  </body>
+</html>

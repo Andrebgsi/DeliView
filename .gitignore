@@ -1,0 +1,9 @@
+# Relatórios reais da loja e testes que conferem os números deles: ficam só neste computador
+dados-teste/
+tests/
+
+# Bancos e backups gerados pelo portal
+*.sqlite
+*.db
+*backup*.zip
+.DS_Store

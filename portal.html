@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Política de segurança: só scripts do próprio site e nenhuma conexão de rede (connect-src 'none'). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; worker-src 'none'; manifest-src 'self'; media-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>DeliView · Portal de BI</title>
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Barra superior (somente < 1024px) -->
+  <header class="topo-movel">
+    <div class="topo-movel__marca">
+      <img src="assets/logo.png" alt="Logo" width="32" height="32">
+      <span>DeliView</span>
+    </div>
+    <button type="button" class="botao-icone" id="botao-menu"
+            aria-label="Abrir menu de navegação" aria-expanded="false" aria-controls="sidebar"></button>
+  </header>
+
+  <div class="backdrop" id="backdrop" hidden></div>
+
+  <aside class="sidebar" id="sidebar" aria-label="Navegação principal">
+    <button type="button" class="botao-icone sidebar__fechar" id="botao-fechar" aria-label="Fechar menu"></button>
+    <div class="sidebar__topo">
+      <div class="sidebar__marca">
+        <img src="assets/logo.png" alt="Logo DeliView" width="40" height="40">
+        <div>
+          <p class="sidebar__titulo">DeliView</p>
+          <p class="sidebar__subtitulo">Painel de BI</p>
+        </div>
+      </div>
+      <nav aria-label="Menu principal">
+        <ul class="menu" id="menu"></ul>
+      </nav>
+    </div>
+    <div class="sidebar__rodape">
+      <a class="indicador-banco" id="indicador-banco" href="#/dados" aria-live="polite">
+        <span class="indicador-banco__ponto" aria-hidden="true"></span>
+        <span class="indicador-banco__textos">
+          <span id="indicador-banco-texto">Abrindo banco…</span>
+          <span class="indicador-banco__arquivo" id="indicador-arquivo-texto"></span>
+        </span>
+      </a>
+      <div class="aviso-sidebar" id="aviso-sidebar" role="note"></div>
+      <p class="sidebar__credito">André Bacelar · PUC Minas 2026/02</p>
+    </div>
+  </aside>
+
+  <div class="faixa-arquivo" id="faixa-arquivo" role="region" aria-label="Arquivo do banco" hidden></div>
+
+  <main class="conteudo" id="conteudo" tabindex="-1"></main>
+
+  <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+  <script src="vendor/sql-asm.js"></script>
+  <script src="js/schema.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/etl/zip-xlsx.js"></script>
+  <script src="js/etl/etl.js"></script>
+  <script src="js/etl/carga.js"></script>
+  <script src="js/backup.js"></script>
+  <script src="js/arquivo-banco.js"></script>
+  <script src="js/icones.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/graficos.js"></script>
+  <script src="js/componentes/calendario.js"></script>
+  <script src="js/componentes/placeholder.js"></script>
+  <script src="js/componentes/banco-inicial.js"></script>
+  <script src="js/consultas/metas.js"></script>
+  <script src="js/consultas/dashboard.js"></script>
+  <script src="js/consultas/olap.js"></script>
+  <script src="js/consultas/insights.js"></script>
+  <script src="js/telas/dashboard.js"></script>
+  <script src="js/telas/importacao.js"></script>
+  <script src="js/telas/metas.js"></script>
+  <script src="js/telas/dados.js"></script>
+  <script src="js/telas/manual.js"></script>
+  <script src="js/iniciar.js"></script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DeliView — Dados que entregam resultados</title>
+    <meta
+      name="description"
+      content="DeliView: painel que junta os pedidos do iFood e do 99Food de um restaurante. Projeto de Sistemas de Informação da PUC Minas, 2026."
+    />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; worker-src 'none'; manifest-src 'self'; media-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="theme-color" content="#0f3d2e" />
+    <link rel="icon" href="assets/logo.png" />
+    <link
+      rel="preload"
+      href="assets/fontes/bricolage-grotesque-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="css/apresentacao.css" />
+  </head>
+  <body>
+    <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+    <header class="topo">
+      <div class="topo__dentro">
+        <a
+          class="marca"
+          href="#inicio"
+          aria-label="DeliView, início da página"
+        >
+          <img src="assets/logo.png" alt="" width="40" height="40" />
+          <span>DeliView</span>
+        </a>
+        <nav class="topo__nav" aria-label="Seções da página">
+          <a href="#como-funciona">Como funciona</a>
+          <a href="#telas">Telas</a>
+          <a href="#privacidade">Privacidade</a>
+          <a href="#trabalho">O trabalho</a>
+        </nav>
+        <a class="botao botao--milho botao--pequeno" href="portal.html"
+          >Abrir o portal</a
+        >
+      </div>
+    </header>
+
+    <main id="conteudo">
+      <section class="abertura" id="inicio" aria-labelledby="titulo-principal">
+        <div class="abertura__dentro">
+          <div class="abertura__texto">
+            <h1 id="titulo-principal">Dados que entregam resultados.</h1>
+            <p class="abertura__lead">
+              O DeliView junta os pedidos do iFood e do 99Food num painel só,
+              confere as contas e mostra faturamento, cancelamentos, taxas e
+              metas do restaurante. Tudo roda no navegador, sem instalar nada.
+            </p>
+            <div class="abertura__acoes">
+              <a class="botao botao--milho" href="portal.html"
+                >Abrir o portal</a
+              >
+              <a class="botao botao--contorno" href="#experimente"
+                >Testar com dados de exemplo</a
+              >
+            </div>
+          </div>
+
+          <figure class="comanda">
+            <div class="comanda__papel" aria-hidden="true">
+              <span class="comanda__linha">Setembro de 2026</span>
+              <span class="comanda__linha comanda__linha--fina"
+                >iFood e 99Food</span
+              >
+            </div>
+            <img
+              class="comanda__tela"
+              src="assets/telas/dashboard.jpg"
+              width="1440"
+              height="900"
+              alt="Painel principal do portal: faturamento de R$ 8.349,25, 229 pedidos concluídos, ticket médio de R$ 36,46, gráfico do faturamento diário por canal e a cascata do bruto ao líquido."
+            />
+            <figcaption>
+              Painel principal com os dados fictícios de setembro de 2026.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="secao" id="como-funciona" aria-labelledby="titulo-como">
+        <div class="secao__dentro">
+          <h2 id="titulo-como" class="secao__titulo">Como funciona</h2>
+          <p class="secao__lead">
+            Do relatório exportado à decisão, em quatro passos.
+          </p>
+          <ol class="passos">
+            <li class="passo">
+              <span class="passo__num" aria-hidden="true">1</span>
+              <h3>Exporte os relatórios</h3>
+              <p>
+                No portal do iFood, do 99Food ou dos dois, baixe o relatório
+                “Dados do pedido” do período que quer analisar.
+              </p>
+            </li>
+            <li class="passo">
+              <span class="passo__num" aria-hidden="true">2</span>
+              <h3>Importe e confira</h3>
+              <p>
+                Arraste as planilhas para o portal, de uma plataforma ou das
+                duas. Ele padroniza os dados, confere as contas de cada canal e
+                grava tudo num banco SQLite dentro do navegador.
+              </p>
+            </li>
+            <li class="passo">
+              <span class="passo__num" aria-hidden="true">3</span>
+              <h3>Defina as metas</h3>
+              <p>
+                Escolha o período no calendário, os dias da semana e o valor. A
+                meta é distribuída por dia e comparada com o realizado.
+              </p>
+            </li>
+            <li class="passo">
+              <span class="passo__num" aria-hidden="true">4</span>
+              <h3>Analise e decida</h3>
+              <p>
+                Filtre por período, canal, pagamento e dia da semana. Gráficos,
+                matriz OLAP e insights automáticos mostram onde agir.
+              </p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section
+        class="secao secao--menta"
+        id="telas"
+        aria-labelledby="titulo-telas"
+      >
+        <div class="secao__dentro">
+          <h2 id="titulo-telas" class="secao__titulo">O que o portal mostra</h2>
+
+          <article class="tela">
+            <img
+              src="assets/telas/graficos.jpg"
+              width="1440"
+              height="900"
+              loading="lazy"
+              alt="Gráficos do dashboard: faturamento diário do iFood e do 99Food, cascata do bruto ao líquido, cancelamento por canal, pedidos por dia da semana e formas de pagamento."
+            />
+            <div class="tela__texto">
+              <h3>Dashboard</h3>
+              <p>
+                Faturamento dia a dia por canal, quanto de cada venda chega ao
+                caixa depois de descontos e taxas, qual plataforma cancela mais
+                e em que dias o restaurante vende mais.
+              </p>
+              <p>Clique num dia do gráfico para ver os pedidos dele.</p>
+            </div>
+          </article>
+
+          <article class="tela tela--invertida">
+            <img
+              src="assets/telas/metas.jpg"
+              width="1440"
+              height="900"
+              loading="lazy"
+              alt="Tela de metas com duas metas de setembro: a do mês inteiro, com 104,4% atingidos, e a dos fins de semana, com 100,3%."
+            />
+            <div class="tela__texto">
+              <h3>Metas</h3>
+              <p>
+                Metas de faturamento e de pedidos para qualquer período: o mês
+                todo, só os fins de semana ou uma promoção de dez dias.
+              </p>
+              <p>
+                Cada meta mostra o atingimento, a curva acumulada e quanto falta
+                vender por dia.
+              </p>
+            </div>
+          </article>
+
+          <article class="tela">
+            <img
+              src="assets/telas/olap.jpg"
+              width="1440"
+              height="900"
+              loading="lazy"
+              alt="Matriz pivot cruzando canal e forma de pagamento, com cores mais escuras para os maiores valores, e o gráfico de comparação com drill-down."
+            />
+            <div class="tela__texto">
+              <h3>Exploração OLAP</h3>
+              <p>
+                Uma matriz que cruza qualquer dimensão com qualquer medida, com
+                inversão de linhas e colunas e exportação em CSV.
+              </p>
+              <p>O drill-down desce do mês para a semana e para o dia.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section
+        class="privacidade"
+        id="privacidade"
+        aria-labelledby="titulo-privacidade"
+      >
+        <div class="secao__dentro privacidade__grade">
+          <div>
+            <h2 id="titulo-privacidade" class="secao__titulo">
+              Os dados ficam no seu computador
+            </h2>
+            <p class="secao__lead">
+              Este site entrega só o programa. As planilhas que você importa são
+              lidas e guardadas pelo seu navegador, e de lá não saem.
+            </p>
+          </div>
+          <ul class="garantias">
+            <li>
+              <h3>Sem servidor de dados</h3>
+              <p>
+                Não há conta nem login. Nem quem publicou o site vê o que você
+                importa.
+              </p>
+            </li>
+            <li>
+              <h3>Envio bloqueado</h3>
+              <p>
+                A página proíbe o navegador de mandar dados para qualquer
+                endereço, até se um arquivo malicioso for importado.
+              </p>
+            </li>
+            <li>
+              <h3>Backup com você</h3>
+              <p>
+                Uma cópia completa em <span lang="en">.zip</span>, salva onde
+                você escolher, para restaurar em outro computador.
+              </p>
+            </li>
+          </ul>
+          <p class="privacidade__aviso">
+            Os dados ficam sem criptografia no navegador. Não use o portal em
+            computador compartilhado e, ao terminar numa máquina que não é sua,
+            apague os dados em Dados e backup.
+          </p>
+        </div>
+      </section>
+
+      <section
+        class="secao"
+        id="experimente"
+        aria-labelledby="titulo-experimente"
+      >
+        <div class="secao__dentro experimente">
+          <div>
+            <h2 id="titulo-experimente" class="secao__titulo">
+              Experimente com dados de exemplo
+            </h2>
+            <p class="secao__lead">
+              Duas planilhas fictícias de setembro de 2026, no mesmo formato dos
+              relatórios reais. Nenhum número delas é de vendas de verdade.
+            </p>
+          </div>
+          <ol class="experimente__passos">
+            <li>
+              Baixe as planilhas do
+              <a href="exemplos/ifood-dados-do-pedido-exemplo.xlsx" download
+                >iFood</a
+              >
+              e do
+              <a href="exemplos/99food-dados-do-pedido-exemplo.xlsx" download
+                >99Food</a
+              >.
+            </li>
+            <li>Abra o portal e escolha <em>Começar com banco vazio</em>.</li>
+            <li>
+              Na aba Importação, arraste as planilhas (uma ou as duas) e clique
+              em <em>Processar e gravar no banco</em>.
+            </li>
+          </ol>
+          <a class="botao botao--floresta" href="portal.html">Abrir o portal</a>
+        </div>
+      </section>
+
+      <section class="trabalho" id="trabalho" aria-labelledby="titulo-trabalho">
+        <div class="secao__dentro trabalho__grade">
+          <div>
+            <h2 id="titulo-trabalho" class="secao__titulo">O trabalho</h2>
+            <p class="secao__lead">
+              O portal é a Etapa 7, Portal e BI, do projeto do Eixo 4 de
+              Sistemas de Informação da PUC Minas. Ele parte do modelo
+              dimensional e do ETL construídos nas etapas anteriores.
+            </p>
+            <h3 class="trabalho__sub">Como foi feito</h3>
+            <ul class="trabalho__lista">
+              <li>
+                Modelo estrela de Kimball, com as fatos de pedidos e de metas
+              </li>
+              <li>
+                ETL em JavaScript que lê os <span lang="en">.xlsx</span> sem
+                bibliotecas
+              </li>
+              <li>Banco SQLite no navegador com o sql.js</li>
+              <li>
+                Operações OLAP:
+                <span lang="en">slice, dice, drill-down, roll-up</span> e
+                <span lang="en">pivot</span>
+              </li>
+              <li>HTML, CSS e JavaScript puros, sem servidor</li>
+            </ul>
+          </div>
+
+          <dl class="ficha">
+            <div>
+              <dt>Instituição</dt>
+              <dd>PUC Minas</dd>
+            </div>
+            <div>
+              <dt>Curso</dt>
+              <dd>Sistemas de Informação</dd>
+            </div>
+            <div>
+              <dt>Projeto</dt>
+              <dd>Eixo 4 - Aplicações para Sustentabilidade</dd>
+            </div>
+            <div>
+              <dt>Semestre</dt>
+              <dd>2º semestre de 2026</dd>
+            </div>
+            <div>
+              <dt>Professora</dt>
+              <dd>Juliana Santiago Teixeira</dd>
+            </div>
+            <div>
+              <dt>Autor</dt>
+              <dd>André Bacelar</dd>
+            </div>
+            <div>
+              <dt>GitHub</dt>
+              <dd>
+                <a href="https://github.com/Andrebgsi" rel="noopener noreferrer"
+                  >github.com/Andrebgsi</a
+                >
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+    </main>
+
+    <footer class="rodape">
+      <div class="rodape__dentro">
+        <a class="marca marca--clara" href="#inicio">
+          <img src="assets/logo.png" alt="" width="32" height="32" />
+          <span>DeliView</span>
+        </a>
+        <nav class="rodape__nav" aria-label="Links do rodapé">
+          <a href="portal.html">Abrir o portal</a>
+          <a href="portal.html#/manual">Manual</a>
+          <a href="https://github.com/Andrebgsi" rel="noopener noreferrer">GitHub</a>
+        </nav>
+        <p>
+          DeliView — Dados que entregam resultados. Projeto acadêmico de
+          André Bacelar, Sistemas de Informação da PUC Minas, 2026.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
