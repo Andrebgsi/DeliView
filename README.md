@@ -4,7 +4,7 @@
 
 **DeliView — Dados que entregam resultados.**
 
-**Teste online:** [deliview.andrebgsi.workers.dev](https://deliview.andrebgsi.workers.dev/). Para experimentar, use as planilhas fictícias de [`exemplos/`](exemplos/). Os dados importados ficam só no seu navegador.
+**Teste online:** <a href="https://deliview.andrebgsi.workers.dev/" target="_blank" rel="noopener noreferrer">deliview.andrebgsi.workers.dev</a>. Para experimentar, use as planilhas fictícias de [`exemplos/`](exemplos/). Os dados importados ficam só no seu navegador.
 
 Portal de Business Intelligence para o **dono de restaurante** acompanhar as vendas no iFood e no 99Food. Ele importa os relatórios de pedidos das plataformas (de uma ou das duas), grava tudo num banco SQLite dentro do navegador, acompanha metas de faturamento por período e mostra um dashboard com filtros, drill-down, matriz pivot, operações OLAP e insights.
 
